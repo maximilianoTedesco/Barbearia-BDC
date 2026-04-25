@@ -1,1 +1,152 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Barbeiros | Barbearia BDC</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      color: #d4af37;
+    }
+
+    /* CARD */
+    .card {
+      position: relative;
+      height: 420px;
+      margin: 16px;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(0,0,0,.8),
+        rgba(0,0,0,.3)
+      );
+    }
+
+    /* FUNDO */
+    .brunin {
+      background: url("barbeiro1.jpg") no-repeat;
+      background-size: cover;
+      background-position: left center;
+    }
+
+    .guilherme {
+      background: url("barbeiro2.jpg") no-repeat;
+      background-size: cover;
+      background-position: right center;
+    }
+
+    /* NOME GRANDE */
+    .name {
+      position: absolute;
+      font-size: 64px;
+      font-weight: bold;
+      color: rgba(255,255,255,0.08);
+      z-index: 1;
+      text-transform: uppercase;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* BOTÃO */
+    .btn {
+      position: relative;
+      z-index: 2;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: 2px solid #d4af37;
+      color: #d4af37;
+      font-weight: bold;
+      font-size: 16px;
+      text-decoration: none;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      transition: .2s;
+    }
+
+    .btn:hover {
+      background: #d4af37;
+      color: #000;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      color: #777;
+      font-size: 14px;
+    }
+
+    @media (max-width: 400px) {
+      .name {
+        font-size: 48px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Escolha seu barbeiro</h1>
+    </header>
+
+    <!-- BRUNIN -->
+    <div class="card brunin">
+      <div class="name">BRUNIN</div>
+
+      <a href="agenda.html?barbeiro=Brunin" class="btn">
+        HORÁRIOS
+      </a>
+    </div>
+
+    <!-- GUILHERME -->
+    <div class="card guilherme">
+      <div class="name">GUILHERME</div>
+
+      <a href="agenda.html?barbeiro=Guilherme" class="btn">
+        HORÁRIOS
+      </a>
+    </div>
+
+    <footer>
+      Barbearia BDC • 2024
+    </footer>
+
+  </div>
+</body>
+</html>
