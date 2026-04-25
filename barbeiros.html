@@ -47,15 +47,16 @@
 
     /* overlay escuro */
     .card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,.2),
-        rgba(0,0,0,.8)
-      );
-    }
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.15),
+    rgba(0,0,0,.75)
+  );
+  z-index: 2;
+}
 
     /* FUNDO */
     .brunin {
@@ -73,17 +74,29 @@
     /* NOME NO FUNDO DA IMAGEM */
 .name {
   position: absolute;
-  top: 115px;
+  top: 110px;
   left: 0;
   width: 100%;
-  font-size: 46px;
+
+  font-size: 72px; /* bem maior */
   font-weight: 900;
-  line-height: 1;
+  letter-spacing: 4px;
   text-align: center;
-  color: rgba(255,255,255,0.12);
   text-transform: uppercase;
-  letter-spacing: 2px;
+
+  color: rgba(255,255,255,0.10); /* leve, tipo marca d'água */
+
   z-index: 1;
+
+  /* contorno escuro suave */
+  -webkit-text-stroke: 1.5px rgba(0,0,0,0.6);
+
+  /* profundidade */
+  text-shadow:
+    2px 2px 4px rgba(0,0,0,0.6),
+    -2px -2px 4px rgba(0,0,0,0.3),
+    0 0 10px rgba(0,0,0,0.4);
+}
 
   /* contorno escuro e suave */
   -webkit-text-stroke: 1px rgba(0,0,0,0.45);
@@ -106,7 +119,7 @@
     /* BOTÃO */
     .btn {
       position: relative;
-      z-index: 2;
+      z-index: 3;
       padding: 14px 28px;
       border-radius: 12px;
       border: 2px solid #d4af37;
@@ -133,9 +146,8 @@
 
     @media (max-width: 400px) {
   .name {
-    font-size: 38px;
-    top: 115px;
-    letter-spacing: 1px;
+    font-size: 52px;
+    top: 100px;
   }
 }
   </style>
