@@ -63,7 +63,6 @@
       border: 1px solid rgba(212,175,55,.35);
       border-radius: 18px;
       padding: 28px;
-      box-shadow: 0 20px 40px rgba(0,0,0,.45);
     }
 
     .section-title {
@@ -79,25 +78,19 @@
       margin-bottom: 28px;
     }
 
-    .day-btn,
-    .time-btn {
+    .day-btn, .time-btn {
       background: #111;
       color: #fff;
       border: 1px solid #444;
       padding: 14px;
       border-radius: 12px;
       cursor: pointer;
-      font-size: 15px;
-      transition: .2s;
     }
 
-    .day-btn:hover,
     .day-btn.active,
-    .time-btn:hover,
     .time-btn.active {
       background: #d4af37;
-      color: #111;
-      border-color: #d4af37;
+      color: #000;
       font-weight: bold;
     }
 
@@ -111,39 +104,14 @@
     .empty-times {
       color: #bbb;
       margin-bottom: 28px;
-      font-size: 15px;
-    }
-
-    form {
-      display: grid;
-      gap: 16px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    label {
-      color: #d4af37;
-      font-size: 14px;
-      font-weight: bold;
     }
 
     input {
-      width: 100%;
       padding: 14px;
       border-radius: 10px;
       border: 1px solid #444;
       background: #111;
       color: #fff;
-      font-size: 15px;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: #d4af37;
     }
 
     .submit-btn {
@@ -152,16 +120,9 @@
       border: none;
       border-radius: 12px;
       background: #d4af37;
-      color: #111;
-      font-size: 16px;
+      color: #000;
       font-weight: bold;
       cursor: pointer;
-      transition: .2s;
-    }
-
-    .submit-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
     }
 
     .msg {
@@ -171,226 +132,153 @@
       display: none;
     }
 
-    .msg.success {
-      display: block;
-      color: #4ade80;
-    }
-
-    .msg.error {
-      display: block;
-      color: #f87171;
-    }
+    .msg.success { display:block; color:#4ade80; }
+    .msg.error { display:block; color:#f87171; }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <a href="barbeiros.html" class="back-link">← Voltar para barbeiros</a>
+<div class="container">
 
-    <header>
-      <h1>Agende seu Horário</h1>
-      <p>Escolha o dia, o horário e envie seus dados.</p>
-      <div id="barberSelected" class="barber-selected"></div>
-    </header>
+<a href="barbeiros.html" class="back-link">← Voltar</a>
 
-    <main class="agenda-box">
-      <h2 class="section-title">Escolha o dia da semana</h2>
+<header>
+<h1>Agende seu Horário</h1>
+<div id="barberSelected" class="barber-selected"></div>
+</header>
 
-      <div class="days">
-        <button type="button" class="day-btn" data-day="Segunda-feira">Segunda</button>
-        <button type="button" class="day-btn" data-day="Terça-feira">Terça</button>
-        <button type="button" class="day-btn" data-day="Quarta-feira">Quarta</button>
-        <button type="button" class="day-btn" data-day="Quinta-feira">Quinta</button>
-        <button type="button" class="day-btn" data-day="Sexta-feira">Sexta</button>
-        <button type="button" class="day-btn" data-day="Sábado">Sábado</button>
-      </div>
+<main class="agenda-box">
 
-      <h2 class="section-title">Escolha o horário</h2>
+<h2 class="section-title">Escolha o dia</h2>
+<div class="days">
+<button class="day-btn" data-day="Segunda-feira">Segunda</button>
+<button class="day-btn" data-day="Terça-feira">Terça</button>
+<button class="day-btn" data-day="Quarta-feira">Quarta</button>
+<button class="day-btn" data-day="Quinta-feira">Quinta</button>
+<button class="day-btn" data-day="Sexta-feira">Sexta</button>
+<button class="day-btn" data-day="Sábado">Sábado</button>
+</div>
 
-      <div id="timesMessage" class="empty-times">
-        Selecione primeiro um dia da semana.
-      </div>
+<h2 class="section-title">Horários</h2>
+<div id="timesMessage" class="empty-times">Selecione um dia</div>
+<div id="times" class="times"></div>
 
-      <div class="times" id="times"></div>
+<h2 class="section-title">Seus dados</h2>
 
-      <h2 class="section-title">Seus dados</h2>
+<form id="agendaForm">
+<input id="nome" placeholder="Nome completo" required />
+<input id="apelido" placeholder="Apelido" required />
+<input id="whatsapp" placeholder="WhatsApp" required />
+<button class="submit-btn" id="submitBtn">Confirmar</button>
+<p id="msg" class="msg"></p>
+</form>
 
-      <form id="agendaForm">
-        <div class="form-group">
-          <label for="nome">Nome completo</label>
-          <input type="text" id="nome" placeholder="Digite seu nome" required />
-        </div>
+</main>
+</div>
 
-        <div class="form-group">
-          <label for="apelido">Apelido</label>
-          <input type="text" id="apelido" placeholder="Como prefere ser chamado?" required />
-        </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <div class="form-group">
-          <label for="whatsapp">WhatsApp</label>
-          <input type="tel" id="whatsapp" placeholder="Ex: 51999999999" required />
-        </div>
+<script>
+const supabaseClient = supabase.createClient(
+"https://zbiitkbmdbcqoxeoyxdb.supabase.co",
+"sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_"
+);
 
-        <button type="submit" class="submit-btn" id="submitBtn">
-          Confirmar agendamento
-        </button>
+const params = new URLSearchParams(window.location.search);
+const barberId = params.get("barber_id");
+const barbeiro = params.get("barbeiro");
 
-        <p id="msg" class="msg"></p>
-      </form>
-    </main>
-  </div>
+document.getElementById("barberSelected").innerText = barbeiro;
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+let selectedDay="";
+let selectedTime="";
 
-  <script>
-    const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
+const timesContainer=document.getElementById("times");
+const timesMessage=document.getElementById("timesMessage");
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+function generateTimes(day){
+timesContainer.innerHTML="";
+selectedTime="";
 
-    const params = new URLSearchParams(window.location.search);
-    const barbeiro = params.get("barbeiro") || "Barbeiro";
+let start=9,end=19;
+if(day==="Segunda-feira"){start=14;end=20;}
 
-    document.getElementById("barberSelected").textContent =
-      "Barbeiro escolhido: " + barbeiro;
+let current=new Date();
+current.setHours(start,0,0,0);
 
-    let selectedDay = "";
-    let selectedTime = "";
+let limit=new Date();
+limit.setHours(end,0,0,0);
 
-    const dayButtons = document.querySelectorAll(".day-btn");
-    const timesContainer = document.getElementById("times");
-    const timesMessage = document.getElementById("timesMessage");
-    const form = document.getElementById("agendaForm");
-    const msg = document.getElementById("msg");
-    const submitBtn = document.getElementById("submitBtn");
+while(current<limit){
+let h=String(current.getHours()).padStart(2,"0");
+let m=String(current.getMinutes()).padStart(2,"0");
+let time=`${h}:${m}`;
 
-    function generateTimes(day) {
-      timesContainer.innerHTML = "";
-      selectedTime = "";
+let btn=document.createElement("button");
+btn.type="button";
+btn.className="time-btn";
+btn.innerText=time;
 
-      let startHour = 9;
-      let endHour = 19;
+btn.onclick=()=>{
+document.querySelectorAll(".time-btn").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+selectedTime=time;
+};
 
-      if (day === "Segunda-feira") {
-        startHour = 14;
-        endHour = 20;
-      }
+timesContainer.appendChild(btn);
+current.setMinutes(current.getMinutes()+40);
+}
 
-      const interval = 40;
+timesMessage.style.display="none";
+}
 
-      const current = new Date();
-      current.setHours(startHour, 0, 0, 0);
+document.querySelectorAll(".day-btn").forEach(btn=>{
+btn.onclick=()=>{
+document.querySelectorAll(".day-btn").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
 
-      const end = new Date();
-      end.setHours(endHour, 0, 0, 0);
+selectedDay=btn.dataset.day;
+generateTimes(selectedDay);
+};
+});
 
-      while (current < end) {
-        const hour = String(current.getHours()).padStart(2, "0");
-        const minute = String(current.getMinutes()).padStart(2, "0");
-        const time = `${hour}:${minute}`;
+document.getElementById("agendaForm").onsubmit=async(e)=>{
+e.preventDefault();
 
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "time-btn";
-        button.textContent = time;
+const nome=document.getElementById("nome").value;
+const apelido=document.getElementById("apelido").value;
+const whatsapp=document.getElementById("whatsapp").value;
 
-        button.addEventListener("click", () => {
-          document.querySelectorAll(".time-btn").forEach(btn => {
-            btn.classList.remove("active");
-          });
+if(!selectedDay || !selectedTime){
+show("Selecione dia e horário","error");
+return;
+}
 
-          button.classList.add("active");
-          selectedTime = time;
-        });
+const {error}=await supabaseClient.from("appointments").insert([{
+barber_id: barberId,
+barber_name: barbeiro,
+customer_name: nome,
+customer_nickname: apelido,
+customer_whatsapp: whatsapp,
+weekday: selectedDay,
+appointment_time: selectedTime,
+status: "novo"
+}]);
 
-        timesContainer.appendChild(button);
-        current.setMinutes(current.getMinutes() + interval);
-      }
+if(error){
+show("Erro ao salvar","error");
+return;
+}
 
-      timesMessage.style.display = "none";
-    }
+show("Agendamento salvo!","success");
+};
 
-    dayButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        dayButtons.forEach(btn => btn.classList.remove("active"));
+function show(text,type){
+const msg=document.getElementById("msg");
+msg.innerText=text;
+msg.className="msg "+type;
+}
+</script>
 
-        button.classList.add("active");
-        selectedDay = button.dataset.day;
-
-        generateTimes(selectedDay);
-      });
-    });
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      const nome = document.getElementById("nome").value.trim();
-      const apelido = document.getElementById("apelido").value.trim();
-      const whatsapp = document.getElementById("whatsapp").value.trim();
-
-      msg.className = "msg";
-      msg.textContent = "";
-
-      if (!selectedDay) {
-        showMessage("Selecione um dia da semana.", "error");
-        return;
-      }
-
-      if (!selectedTime) {
-        showMessage("Selecione um horário.", "error");
-        return;
-      }
-
-      if (!nome || !apelido || !whatsapp) {
-        showMessage("Preencha todos os campos.", "error");
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Salvando...";
-
-      const appointmentData = {
-        barber_name: barbeiro,
-        customer_name: nome,
-        customer_nickname: apelido,
-        customer_whatsapp: whatsapp,
-        weekday: selectedDay,
-        appointment_time: selectedTime,
-        status: "novo"
-      };
-
-      const { error } = await supabaseClient
-        .from("appointments")
-        .insert([appointmentData]);
-
-      if (error) {
-        console.error("Erro Supabase:", error);
-        showMessage("Erro ao salvar agendamento. Verifique o Supabase.", "error");
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Confirmar agendamento";
-        return;
-      }
-
-      showMessage("Agendamento salvo com sucesso!", "success");
-
-      form.reset();
-      selectedDay = "";
-      selectedTime = "";
-
-      dayButtons.forEach(btn => btn.classList.remove("active"));
-      timesContainer.innerHTML = "";
-      timesMessage.style.display = "block";
-      timesMessage.textContent = "Selecione primeiro um dia da semana.";
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Confirmar agendamento";
-    });
-
-    function showMessage(text, type) {
-      msg.textContent = text;
-      msg.className = `msg ${type}`;
-    }
-  </script>
 </body>
 </html>
