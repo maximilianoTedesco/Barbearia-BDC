@@ -353,13 +353,13 @@ cancelBtn.onclick = () => {
   const nome = document.getElementById("nome").value.trim();
   const whatsapp = document.getElementById("whatsapp").value.trim();
 
-  if (!selectedDay || !selectedDate || !selectedTime) {
-    show("Selecione o dia e horário que deseja desmarcar.", "error");
+  if (!nome) {
+    show("Informe seu nome para solicitar a desmarcação.", "error");
     return;
   }
 
-  if (!nome) {
-    show("Informe seu nome para solicitar a desmarcação.", "error");
+  if (!whatsapp) {
+    show("Informe seu WhatsApp para solicitar a desmarcação.", "error");
     return;
   }
 
@@ -369,8 +369,6 @@ Olá! Quero desmarcar meu horário.
 Nome: ${nome}
 WhatsApp: ${whatsapp}
 Barbeiro: ${barbeiro}
-Data: ${selectedDay} - ${selectedDate}
-Horário: ${selectedTime}
 `;
 
   const url = `https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
