@@ -66,14 +66,9 @@
       margin-bottom: 16px;
     }
 
-    .date-input {
-      width: 100%;
-      margin-bottom: 28px;
-    }
-
     .days {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
       gap: 12px;
       margin-bottom: 28px;
     }
@@ -86,13 +81,26 @@
       padding: 14px;
       border-radius: 12px;
       cursor: pointer;
+      font-weight: bold;
+    }
+
+    .day-btn span {
+      display: block;
+      font-size: 13px;
+      color: #bbb;
+      margin-top: 4px;
+      font-weight: normal;
     }
 
     .day-btn.active,
     .time-btn.active {
       background: #d4af37;
       color: #000;
-      font-weight: bold;
+      border-color: #d4af37;
+    }
+
+    .day-btn.active span {
+      color: #000;
     }
 
     .time-btn.ocupado {
@@ -113,6 +121,7 @@
     .empty-times {
       color: #bbb;
       margin-bottom: 28px;
+      font-size: 18px;
     }
 
     input {
@@ -171,11 +180,11 @@
     </header>
 
     <main class="agenda-box">
-      <h2 class="section-title">Escolha a data</h2>
-      <input type="date" id="appointmentDate" class="date-input" required />
+      <h2 class="section-title">Escolha o dia</h2>
+      <div id="days" class="days"></div>
 
       <h2 class="section-title">Horários</h2>
-      <div id="timesMessage" class="empty-times">Selecione uma data</div>
+      <div id="timesMessage" class="empty-times">Selecione um dia</div>
       <div id="times" class="times"></div>
 
       <h2 class="section-title">Seus dados</h2>
@@ -203,7 +212,7 @@
     const barbeiro = params.get("barbeiro");
 
     const barberSelected = document.getElementById("barberSelected");
-    const appointmentDateInput = document.getElementById("appointmentDate");
+    const daysContainer = document.getElementById("days");
     const timesContainer = document.getElementById("times");
     const timesMessage = document.getElementById("timesMessage");
     const agendaForm = document.getElementById("agendaForm");
@@ -215,25 +224,79 @@
 
     barberSelected.innerText = barbeiro ? barbeiro : "Barbeiro não identificado";
 
-    const hoje = new Date();
-    const hojeFormatado = hoje.toISOString().split("T")[0];
-    appointmentDateInput.min = hojeFormatado;
+    const diasSemana = [
+      "Domingo",
+      "Segunda-feira",
+      "Terça-feira",
+      "Quarta-feira",
+      "Quinta-feira",
+      "Sexta-feira",
+      "Sábado"
+    ];
 
-    function obterDiaSemana(dataISO) {
-      const dias = [
-        "Domingo",
-        "Segunda-feira",
-        "Terça-feira",
-        "Quarta-feira",
-        "Quinta-feira",
-        "Sexta-feira",
-        "Sábado"
-      ];
+    function formatarDataISO(data) {
+      const ano = data.getFullYear();
+      const mes = String(data.getMonth() + 1).padStart(2, "0");
+      const dia = String(data.getDate()).padStart(2, "0");
+      return `${ano}-${mes}-${dia}`;
+    }
 
-      const [ano, mes, dia] = dataISO.split("-").map(Number);
-      const data = new Date(ano, mes - 1, dia);
+    function formatarDataBR(data) {
+      const dia = String(data.getDate()).padStart(2, "0");
+      const mes = String(data.getMonth() + 1).padStart(2, "0");
+      return `${dia}/${mes}`;
+    }
 
-      return dias[data.getDay()];
+    function gerarDias() {
+      daysContainer.innerHTML = "";
+
+      let diasCriados = 0;
+      let contador = 0;
+
+      while (diasCriados < 8) {
+        const data = new Date();
+        data.setDate(data.getDate() + contador);
+
+        const nomeDia = diasSemana[data.getDay()];
+
+        if (nomeDia !== "Domingo") {
+          const dataISO = formatarDataISO(data);
+          const dataBR = formatarDataBR(data);
+
+          let textoPrincipal = nomeDia.replace("-feira", "");
+
+          if (contador === 0) {
+            textoPrincipal = "Hoje";
+          }
+
+          if (contador === 1) {
+            textoPrincipal = "Amanhã";
+          }
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "day-btn";
+          btn.dataset.date = dataISO;
+          btn.dataset.day = nomeDia;
+          btn.innerHTML = `${textoPrincipal}<span>${nomeDia} - ${dataBR}</span>`;
+
+          btn.onclick = async () => {
+            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            selectedDate = dataISO;
+            selectedDay = nomeDia;
+            selectedTime = "";
+
+            await generateTimes();
+          };
+
+          daysContainer.appendChild(btn);
+          diasCriados++;
+        }
+
+        contador++;
+      }
     }
 
     async function buscarHorariosOcupados(barberId, appointmentDate) {
@@ -261,16 +324,8 @@
         return;
       }
 
-      if (!selectedDate) {
-        timesMessage.innerText = "Selecione uma data";
-        timesMessage.style.display = "block";
-        return;
-      }
-
-      selectedDay = obterDiaSemana(selectedDate);
-
-      if (selectedDay === "Domingo") {
-        timesMessage.innerText = "Não atendemos aos domingos.";
+      if (!selectedDate || !selectedDay) {
+        timesMessage.innerText = "Selecione um dia";
         timesMessage.style.display = "block";
         return;
       }
@@ -319,11 +374,6 @@
       timesMessage.style.display = "none";
     }
 
-    appointmentDateInput.addEventListener("change", async () => {
-      selectedDate = appointmentDateInput.value;
-      await generateTimes();
-    });
-
     agendaForm.onsubmit = async (e) => {
       e.preventDefault();
 
@@ -332,7 +382,7 @@
       const whatsapp = document.getElementById("whatsapp").value.trim();
 
       if (!selectedDate || !selectedDay || !selectedTime) {
-        show("Selecione data e horário.", "error");
+        show("Selecione dia e horário.", "error");
         return;
       }
 
@@ -367,13 +417,16 @@
       }
 
       show("Agendamento salvo com sucesso!", "success");
+
       agendaForm.reset();
       selectedDate = "";
       selectedDay = "";
       selectedTime = "";
       timesContainer.innerHTML = "";
-      timesMessage.innerText = "Selecione uma data";
+      timesMessage.innerText = "Selecione um dia";
       timesMessage.style.display = "block";
+
+      document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
 
       submitBtn.disabled = false;
       submitBtn.innerText = "Confirmar";
@@ -384,6 +437,8 @@
       msg.innerText = text;
       msg.className = "msg " + type;
     }
+
+    gerarDias();
   </script>
 </body>
 </html>
