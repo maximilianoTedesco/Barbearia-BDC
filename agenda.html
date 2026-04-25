@@ -340,6 +340,9 @@
 
       const horariosOcupados = await buscarHorariosOcupados(barberId, selectedDate);
 
+      const agora = new Date();
+      const hojeISO = formatarDataISO(agora);
+
       let current = new Date();
       current.setHours(start, 0, 0, 0);
 
@@ -351,12 +354,18 @@
         const m = String(current.getMinutes()).padStart(2, "0");
         const time = `${h}:${m}`;
 
-        const ocupado = horariosOcupados.includes(time);
+        let horarioPassado = false;
+
+        if (selectedDate === hojeISO) {
+          horarioPassado = current < agora;
+        }
+
+        const ocupado = horariosOcupados.includes(time) || horarioPassado;
 
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = ocupado ? "time-btn ocupado" : "time-btn";
-        btn.innerText = ocupado ? `${time} Ocupado` : time;
+        btn.innerText = ocupado ? `${time}\nIndisponível` : time;
         btn.disabled = ocupado;
 
         if (!ocupado) {
@@ -411,12 +420,15 @@
           show("Erro ao salvar agendamento.", "error");
         }
 
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
         submitBtn.disabled = false;
         submitBtn.innerText = "Confirmar";
         return;
       }
 
       show("Agendamento salvo com sucesso!", "success");
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       agendaForm.reset();
       selectedDate = "";
