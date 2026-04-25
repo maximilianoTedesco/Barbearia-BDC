@@ -274,40 +274,49 @@
     const form = document.getElementById("agendaForm");
     const msg = document.getElementById("msg");
 
-    function generateTimes() {
-      const startHour = 9;
-      const endHour = 19;
-      const interval = 40;
+    function generateTimes(day) {
+  const interval = 40;
+  let startHour;
+  let endHour;
 
-      let current = new Date();
-      current.setHours(startHour, 0, 0, 0);
+  // 🟡 Regra especial
+  if (day === "Segunda-feira") {
+    startHour = 14;
+    endHour = 20;
+  } else {
+    startHour = 9;
+    endHour = 19;
+  }
 
-      let end = new Date();
-      end.setHours(endHour, 0, 0, 0);
+  timesContainer.innerHTML = "";
 
-      while (current < end) {
-        const hour = String(current.getHours()).padStart(2, "0");
-        const minute = String(current.getMinutes()).padStart(2, "0");
-        const time = `${hour}:${minute}`;
+  let current = new Date();
+  current.setHours(startHour, 0, 0, 0);
 
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "time-btn";
-        btn.textContent = time;
-        btn.dataset.time = time;
+  let end = new Date();
+  end.setHours(endHour, 0, 0, 0);
 
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          selectedTime = time;
-        });
+  while (current < end) {
+    const hour = String(current.getHours()).padStart(2, "0");
+    const minute = String(current.getMinutes()).padStart(2, "0");
+    const time = `${hour}:${minute}`;
 
-        timesContainer.appendChild(btn);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "time-btn";
+    btn.textContent = time;
 
-        current.setMinutes(current.getMinutes() + interval);
-      }
-    }
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedTime = time;
+    });
 
+    timesContainer.appendChild(btn);
+
+    current.setMinutes(current.getMinutes() + interval);
+  }
+}
     daysButtons.forEach(button => {
       button.addEventListener("click", () => {
         daysButtons.forEach(btn => btn.classList.remove("active"));
