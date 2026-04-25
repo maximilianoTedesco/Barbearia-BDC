@@ -24,6 +24,7 @@ body {
   align-items: flex-end;
   justify-content: center;
   padding: 24px;
+  overflow: hidden;
 }
 
 .hero-overlay {
