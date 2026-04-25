@@ -132,6 +132,28 @@
       display: none;
     }
 
+    .horario {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #d4af37;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.horario.selecionado {
+  background: #fff;
+  color: #000;
+}
+
+.horario.ocupado {
+  background: #555;
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
     .msg.success { display:block; color:#4ade80; }
     .msg.error { display:block; color:#f87171; }
   </style>
@@ -278,6 +300,86 @@ const msg=document.getElementById("msg");
 msg.innerText=text;
 msg.className="msg "+type;
 }
+
+  <script>
+async function buscarHorariosOcupados(barberId, dataSelecionada) {
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("time")
+    .eq("barber_id", barberId)
+    .eq("date", dataSelecionada);
+
+  if (error) {
+    console.error("Erro ao buscar horários ocupados:", error);
+    return [];
+  }
+
+  return data.map(item => item.time);
+}
+  <script>
+const horariosDisponiveis = [
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00"
+];
+
+let horarioSelecionado = null;
+
+async function carregarHorarios() {
+  const barberId = document.getElementById("barber_id").value;
+  const dataSelecionada = document.getElementById("date").value;
+  const horariosContainer = document.getElementById("horarios");
+
+  horarioSelecionado = null;
+  horariosContainer.innerHTML = "";
+
+  if (!barberId || !dataSelecionada) {
+    horariosContainer.innerHTML = "<p>Selecione o barbeiro e a data.</p>";
+    return;
+  }
+
+  const horariosOcupados = await buscarHorariosOcupados(barberId, dataSelecionada);
+
+  horariosDisponiveis.forEach(horario => {
+    const ocupado = horariosOcupados.includes(horario);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = ocupado ? `${horario} - Ocupado` : horario;
+    button.className = ocupado ? "horario ocupado" : "horario";
+
+    button.disabled = ocupado;
+
+    if (!ocupado) {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".horario").forEach(btn => {
+          btn.classList.remove("selecionado");
+        });
+
+        button.classList.add("selecionado");
+        horarioSelecionado = horario;
+      });
+    }
+
+    horariosContainer.appendChild(button);
+  });
+}
+
+document.getElementById("barber_id").addEventListener("change", carregarHorarios);
+document.getElementById("date").addEventListener("change", carregarHorarios);
+
 </script>
 
 </body>
