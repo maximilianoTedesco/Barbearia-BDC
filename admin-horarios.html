@@ -410,8 +410,8 @@
       </div>
     </section>
 
-    <div class="card">
-      <h2>Filtros</h2>
+   <div class="card" id="resultSection">
+  <h2>Agendamentos</h2>
 
       <div class="filters">
         <div>
@@ -755,10 +755,17 @@
       });
 
       table.classList.remove("hidden");
+
+      document.getElementById("resultSection").scrollIntoView({
+  behavior: "smooth",
+  block: "start"
+});
     }
 
     async function createAppointment() {
       initSupabase();
+
+    
 
       if (!supabaseClient) return;
 
