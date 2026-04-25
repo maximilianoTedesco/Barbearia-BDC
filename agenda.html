@@ -163,7 +163,7 @@ display:none;
 <h2 class="section-title">Escolha o dia</h2>
 <div id="days" class="days"></div>
 
-<h2 class="section-title">Horários</h2>
+<h2 id="horariosTitulo" class="section-title">Horários</h2>
 <div id="timesMessage" class="empty-times">Selecione um dia</div>
 <div id="times" class="times"></div>
 
@@ -203,6 +203,7 @@ const barberSelected=document.getElementById("barberSelected");
 const daysContainer=document.getElementById("days");
 const timesContainer=document.getElementById("times");
 const timesMessage=document.getElementById("timesMessage");
+const horariosTitulo=document.getElementById("horariosTitulo");
 const agendaForm=document.getElementById("agendaForm");
 const submitBtn=document.getElementById("submitBtn");
 const cancelBtn=document.getElementById("cancelWhatsappBtn");
@@ -221,6 +222,15 @@ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.
 
 function formatBR(d){
 return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+function rolarParaHorarios(){
+setTimeout(()=>{
+horariosTitulo.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+},200);
 }
 
 function gerarDias(){
@@ -249,7 +259,10 @@ btn.classList.add("active");
 
 selectedDate=btn.dataset.date;
 selectedDay=btn.dataset.day;
+selectedTime="";
+
 await gerarHorarios();
+rolarParaHorarios();
 };
 
 daysContainer.appendChild(btn);
