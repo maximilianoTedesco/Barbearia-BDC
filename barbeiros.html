@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -70,16 +70,24 @@
       background-position: right center;
     }
 
-    /* NOME */
+    /* NOME AJUSTADO */
     .name {
       position: absolute;
-      top: 40px;
-      width: 100%;
-      font-size: 56px;
-      font-weight: bold;
-      color: rgba(255,255,255,0.08);
+      top: 90px; /* desce para ficar na altura da cabeça */
+      width: 80%;
+      font-size: 34px; /* menor */
+      font-weight: 900;
+      color: rgba(255,255,255,0.25); /* mais visível */
       text-transform: uppercase;
       z-index: 1;
+
+      /* CONTORNO */
+      -webkit-text-stroke: 1px rgba(255,255,255,0.6);
+
+      /* fallback + reforço visual */
+      text-shadow:
+        1px 1px 2px rgba(0,0,0,0.8),
+        -1px -1px 2px rgba(0,0,0,0.8);
     }
 
     /* ajustes individuais */
@@ -91,6 +99,7 @@
     .guilherme .name {
       text-align: right;
       padding-right: 20px;
+      margin-left: auto;
     }
 
     /* BOTÃO */
@@ -123,7 +132,8 @@
 
     @media (max-width: 400px) {
       .name {
-        font-size: 44px;
+        font-size: 28px;
+        top: 80px;
       }
     }
   </style>
