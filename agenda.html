@@ -134,7 +134,7 @@ background:#25D366;
 color:#fff;
 font-weight:bold;
 cursor:pointer;
-display:none;
+display:block;
 }
 
 .msg{
@@ -350,20 +350,37 @@ return;
 }
 
 show("Agendamento salvo!","success");
-cancelBtn.style.display="block";
 
 window.scrollTo({top:0,behavior:"smooth"});
 };
 
-cancelBtn.onclick=()=>{
-const mensagem=`
+cancelBtn.onclick = () => {
+  const nome = document.getElementById("nome").value.trim();
+  const whatsapp = document.getElementById("whatsapp").value.trim();
+
+  if (!selectedDay || !selectedDate || !selectedTime) {
+    show("Selecione o dia e horário que deseja desmarcar.", "error");
+    return;
+  }
+
+  if (!nome) {
+    show("Informe seu nome para solicitar a desmarcação.", "error");
+    return;
+  }
+
+  const mensagem = `
 Olá! Quero desmarcar meu horário.
 
-Nome: ${dadosCliente.nome}
+Nome: ${nome}
+WhatsApp: ${whatsapp}
 Barbeiro: ${barbeiro}
 Data: ${selectedDay} - ${selectedDate}
 Horário: ${selectedTime}
 `;
+
+  const url = `https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+  window.open(url, "_blank");
+};
 
 const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
 window.open(url,"_blank");
