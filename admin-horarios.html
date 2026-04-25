@@ -546,9 +546,7 @@
         .order("appointment_date", { ascending: true });
 
       if (filterDate) {
-        query = query
-          .gte("appointment_date", `${filterDate}T00:00:00`)
-          .lte("appointment_date", `${filterDate}T23:59:59`);
+      query = query.eq("appointment_date", filterDate);
       }
 
       if (filterBarber) query = query.eq("barber_id", filterBarber);
@@ -587,7 +585,7 @@
 
         tr.innerHTML = `
           <td data-label="Data">${formatDate(item.appointment_date)}</td>
-          <td data-label="Horário"><strong>${formatTime(item.appointment_date)}</strong></td>
+          <td data-label="Horário"><strong>${item.appointment_time || formatTime(item.appointment_date)}</strong></td>
           <td data-label="Barbeiro">${barberName}</td>
           <td data-label="Cliente">${clientName}</td>
           <td data-label="WhatsApp">${whatsapp}</td>
@@ -639,16 +637,17 @@
         return;
       }
 
-      const appointmentDate = `${date}T${time}:00`;
+      const appointmentDate = date;
 
       const payload = {
-        appointment_date: appointmentDate,
-        barber_id: barber,
-        customer_name: name || null,
-        customer_whatsapp: whatsapp || null,
-        note: note || null,
-        status: "scheduled"
-      };
+          appointment_date: appointmentDate,
+          appointment_time: time,
+          barber_id: barber,
+          customer_name: name || null,
+          customer_whatsapp: whatsapp || null,
+          note: note || null,
+          status: "scheduled"
+    };
 
       const { error } = await supabaseClient
         .from("appointments")
