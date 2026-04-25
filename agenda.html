@@ -159,6 +159,11 @@
       transition: .2s;
     }
 
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
     .msg {
       margin-top: 16px;
       text-align: center;
@@ -226,18 +231,28 @@
           <input type="tel" id="whatsapp" placeholder="Ex: 51999999999" required />
         </div>
 
-        <button type="submit" class="submit-btn">Confirmar agendamento</button>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          Confirmar agendamento
+        </button>
 
         <p id="msg" class="msg"></p>
       </form>
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
     const params = new URLSearchParams(window.location.search);
     const barbeiro = params.get("barbeiro") || "Barbeiro";
 
-    document.getElementById("barberSelected").textContent = "Barbeiro escolhido: " + barbeiro;
+    document.getElementById("barberSelected").textContent =
+      "Barbeiro escolhido: " + barbeiro;
 
     let selectedDay = "";
     let selectedTime = "";
@@ -247,6 +262,7 @@
     const timesMessage = document.getElementById("timesMessage");
     const form = document.getElementById("agendaForm");
     const msg = document.getElementById("msg");
+    const submitBtn = document.getElementById("submitBtn");
 
     function generateTimes(day) {
       timesContainer.innerHTML = "";
@@ -305,7 +321,7 @@
       });
     });
 
-    form.addEventListener("submit", function(event) {
+    form.addEventListener("submit", async function(event) {
       event.preventDefault();
 
       const nome = document.getElementById("nome").value.trim();
@@ -330,6 +346,9 @@
         return;
       }
 
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Salvando...";
+
       const appointmentData = {
         barber_name: barbeiro,
         customer_name: nome,
@@ -340,9 +359,20 @@
         status: "novo"
       };
 
-      console.log("Agendamento pronto para Supabase:", appointmentData);
+      const { error } = await supabaseClient
+        .from("appointments")
+        .insert([appointmentData]);
 
-      showMessage("Agendamento registrado com sucesso!", "success");
+      if (error) {
+        console.error("Erro Supabase:", error);
+        showMessage("Erro ao salvar agendamento. Verifique o Supabase.", "error");
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Confirmar agendamento";
+        return;
+      }
+
+      showMessage("Agendamento salvo com sucesso!", "success");
 
       form.reset();
       selectedDay = "";
@@ -352,6 +382,9 @@
       timesContainer.innerHTML = "";
       timesMessage.style.display = "block";
       timesMessage.textContent = "Selecione primeiro um dia da semana.";
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Confirmar agendamento";
     });
 
     function showMessage(text, type) {
