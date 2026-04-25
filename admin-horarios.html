@@ -657,6 +657,15 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
         showAdmin();
       }
     });
+
+    function getBarberName(barberId) {
+  const map = {
+    "UUID_DO_BRUNIN": "Brunin",
+    "UUID_DO_GUILHERME": "Guilherme"
+  };
+
+  return map[barberId] || "Barbeiro";
+}
   </script>
 </body>
 </html>
