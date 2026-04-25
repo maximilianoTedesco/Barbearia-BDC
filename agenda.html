@@ -1,456 +1,382 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agenda | Barbearia BDC</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agenda | Barbearia BDC</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-    body {
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      background:
-        linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.9)),
-        url("hero.jpg") center/cover no-repeat;
-      color: #fff;
-      padding: 24px;
-    }
+body{
+min-height:100vh;
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.9)),
+url("hero.jpg") center/cover no-repeat;
+color:#fff;
+padding:24px;
+}
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-    }
+.container{max-width:980px;margin:0 auto;}
 
-    .back-link {
-      display: inline-block;
-      margin-bottom: 22px;
-      color: #d4af37;
-      text-decoration: none;
-      font-weight: bold;
-    }
+.back-link{
+display:inline-block;
+margin-bottom:22px;
+color:#d4af37;
+text-decoration:none;
+font-weight:bold;
+}
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
+header{text-align:center;margin-bottom:32px;}
 
-    header h1 {
-      font-size: 36px;
-      color: #d4af37;
-      margin-bottom: 8px;
-    }
+header h1{font-size:36px;color:#d4af37;margin-bottom:8px;}
 
-    .barber-selected {
-      margin-top: 12px;
-      color: #d4af37;
-      font-weight: bold;
-      font-size: 18px;
-    }
+.barber-selected{
+margin-top:12px;
+color:#d4af37;
+font-weight:bold;
+font-size:18px;
+}
 
-    .agenda-box {
-      background: rgba(20, 20, 20, 0.94);
-      border: 1px solid rgba(212,175,55,.35);
-      border-radius: 18px;
-      padding: 28px;
-    }
+.agenda-box{
+background:rgba(20,20,20,.94);
+border:1px solid rgba(212,175,55,.35);
+border-radius:18px;
+padding:28px;
+}
 
-    .section-title {
-      font-size: 22px;
-      color: #d4af37;
-      margin-bottom: 16px;
-    }
+.section-title{
+font-size:22px;
+color:#d4af37;
+margin-bottom:16px;
+}
 
-    .days {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
-    }
+.days{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+gap:12px;
+margin-bottom:28px;
+}
 
-    .day-btn,
-    .time-btn {
-      background: #111;
-      color: #fff;
-      border: 1px solid #444;
-      padding: 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.day-btn,.time-btn{
+background:#111;
+color:#fff;
+border:1px solid #444;
+padding:14px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
 
-    .day-btn span {
-      display: block;
-      font-size: 13px;
-      color: #bbb;
-      margin-top: 4px;
-      font-weight: normal;
-    }
+.day-btn span{
+display:block;
+font-size:13px;
+color:#bbb;
+margin-top:4px;
+}
 
-    .day-btn.active,
-    .time-btn.active {
-      background: #d4af37;
-      color: #000;
-      border-color: #d4af37;
-    }
+.day-btn.active,.time-btn.active{
+background:#d4af37;
+color:#000;
+border-color:#d4af37;
+}
 
-    .day-btn.active span {
-      color: #000;
-    }
+.time-btn.ocupado{
+background:#555;
+color:#aaa;
+cursor:not-allowed;
+opacity:.6;
+text-decoration:line-through;
+}
 
-    .time-btn.ocupado {
-      background: #555;
-      color: #aaa;
-      cursor: not-allowed;
-      opacity: 0.6;
-      text-decoration: line-through;
-    }
+.times{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+gap:12px;
+margin-bottom:28px;
+}
 
-    .times {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 12px;
-      margin-bottom: 28px;
-    }
+.empty-times{
+color:#bbb;
+margin-bottom:28px;
+font-size:18px;
+}
 
-    .empty-times {
-      color: #bbb;
-      margin-bottom: 28px;
-      font-size: 18px;
-    }
+input{
+width:100%;
+padding:14px;
+border-radius:10px;
+border:1px solid #444;
+background:#111;
+color:#fff;
+margin-bottom:12px;
+}
 
-    input {
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: 1px solid #444;
-      background: #111;
-      color: #fff;
-      margin-bottom: 12px;
-    }
+.submit-btn{
+width:100%;
+margin-top:10px;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#d4af37;
+color:#000;
+font-weight:bold;
+cursor:pointer;
+}
 
-    .submit-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #d4af37;
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.whatsapp-btn{
+width:100%;
+margin-top:10px;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#25D366;
+color:#fff;
+font-weight:bold;
+cursor:pointer;
+display:none;
+}
 
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+.msg{
+margin-top:16px;
+text-align:center;
+font-weight:bold;
+display:none;
+}
 
-    .msg {
-      margin-top: 16px;
-      text-align: center;
-      font-weight: bold;
-      display: none;
-    }
-
-    .msg.success {
-      display: block;
-      color: #4ade80;
-    }
-
-    .msg.error {
-      display: block;
-      color: #f87171;
-    }
-  </style>
+.msg.success{display:block;color:#4ade80;}
+.msg.error{display:block;color:#f87171;}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <a href="barbeiros.html" class="back-link">← Voltar</a>
+<div class="container">
 
-    <header>
-      <h1>Agende seu Horário</h1>
-      <div id="barberSelected" class="barber-selected"></div>
-    </header>
+<a href="barbeiros.html" class="back-link">← Voltar</a>
 
-    <main class="agenda-box">
-      <h2 class="section-title">Escolha o dia</h2>
-      <div id="days" class="days"></div>
+<header>
+<h1>Agende seu Horário</h1>
+<div id="barberSelected" class="barber-selected"></div>
+</header>
 
-      <h2 class="section-title">Horários</h2>
-      <div id="timesMessage" class="empty-times">Selecione um dia</div>
-      <div id="times" class="times"></div>
+<main class="agenda-box">
 
-      <h2 class="section-title">Seus dados</h2>
+<h2 class="section-title">Escolha o dia</h2>
+<div id="days" class="days"></div>
 
-      <form id="agendaForm">
-        <input id="nome" placeholder="Nome completo" required />
-        <input id="apelido" placeholder="Apelido" required />
-        <input id="whatsapp" placeholder="WhatsApp" required />
-        <button class="submit-btn" id="submitBtn">Confirmar</button>
-        <p id="msg" class="msg"></p>
-      </form>
-    </main>
-  </div>
+<h2 class="section-title">Horários</h2>
+<div id="timesMessage" class="empty-times">Selecione um dia</div>
+<div id="times" class="times"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<h2 class="section-title">Seus dados</h2>
 
-  <script>
-    const supabaseClient = supabase.createClient(
-      "https://zbiitkbmdbcqoxeoyxdb.supabase.co",
-      "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_"
-    );
+<form id="agendaForm">
+<input id="nome" placeholder="Nome completo" required />
+<input id="apelido" placeholder="Apelido" required />
+<input id="whatsapp" placeholder="WhatsApp" required />
+<button class="submit-btn" id="submitBtn">Confirmar</button>
 
-    const params = new URLSearchParams(window.location.search);
-    const barberId = params.get("barber_id");
-    const barbeiro = params.get("barbeiro");
+<button type="button" id="cancelWhatsappBtn" class="whatsapp-btn">
+Desmarcar pelo WhatsApp
+</button>
 
-    const barberSelected = document.getElementById("barberSelected");
-    const daysContainer = document.getElementById("days");
-    const timesContainer = document.getElementById("times");
-    const timesMessage = document.getElementById("timesMessage");
-    const agendaForm = document.getElementById("agendaForm");
-    const submitBtn = document.getElementById("submitBtn");
+<p id="msg" class="msg"></p>
+</form>
 
-    let selectedDate = "";
-    let selectedDay = "";
-    let selectedTime = "";
+</main>
+</div>
 
-    barberSelected.innerText = barbeiro ? barbeiro : "Barbeiro não identificado";
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const diasSemana = [
-      "Domingo",
-      "Segunda-feira",
-      "Terça-feira",
-      "Quarta-feira",
-      "Quinta-feira",
-      "Sexta-feira",
-      "Sábado"
-    ];
+<script>
+const supabaseClient = supabase.createClient(
+"https://zbiitkbmdbcqoxeoyxdb.supabase.co",
+"sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_"
+);
 
-    function formatarDataISO(data) {
-      const ano = data.getFullYear();
-      const mes = String(data.getMonth() + 1).padStart(2, "0");
-      const dia = String(data.getDate()).padStart(2, "0");
-      return `${ano}-${mes}-${dia}`;
-    }
+const telefoneBarbearia="5551989096675";
 
-    function formatarDataBR(data) {
-      const dia = String(data.getDate()).padStart(2, "0");
-      const mes = String(data.getMonth() + 1).padStart(2, "0");
-      return `${dia}/${mes}`;
-    }
+const params=new URLSearchParams(window.location.search);
+const barberId=params.get("barber_id");
+const barbeiro=params.get("barbeiro");
 
-    function gerarDias() {
-      daysContainer.innerHTML = "";
+const barberSelected=document.getElementById("barberSelected");
+const daysContainer=document.getElementById("days");
+const timesContainer=document.getElementById("times");
+const timesMessage=document.getElementById("timesMessage");
+const agendaForm=document.getElementById("agendaForm");
+const submitBtn=document.getElementById("submitBtn");
+const cancelBtn=document.getElementById("cancelWhatsappBtn");
 
-      let diasCriados = 0;
-      let contador = 0;
+let selectedDate="";
+let selectedDay="";
+let selectedTime="";
+let dadosCliente={};
 
-      while (diasCriados < 8) {
-        const data = new Date();
-        data.setDate(data.getDate() + contador);
+barberSelected.innerText=barbeiro;
 
-        const nomeDia = diasSemana[data.getDay()];
+const diasSemana=["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
 
-        if (nomeDia !== "Domingo") {
-          const dataISO = formatarDataISO(data);
-          const dataBR = formatarDataBR(data);
+function formatISO(d){
+return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
 
-          let textoPrincipal = nomeDia.replace("-feira", "");
+function formatBR(d){
+return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+}
 
-          if (contador === 0) {
-            textoPrincipal = "Hoje";
-          }
+function gerarDias(){
+let diasCriados=0,cont=0;
 
-          if (contador === 1) {
-            textoPrincipal = "Amanhã";
-          }
+while(diasCriados<7){
+let d=new Date();
+d.setDate(d.getDate()+cont);
 
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "day-btn";
-          btn.dataset.date = dataISO;
-          btn.dataset.day = nomeDia;
-          btn.innerHTML = `${textoPrincipal}<span>${nomeDia} - ${dataBR}</span>`;
+let nome=diasSemana[d.getDay()];
+if(nome!=="Domingo"){
+let btn=document.createElement("button");
+btn.className="day-btn";
+btn.dataset.date=formatISO(d);
+btn.dataset.day=nome;
 
-          btn.onclick = async () => {
-            document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
+let label=nome.replace("-feira","");
+if(cont===0)label="Hoje";
+if(cont===1)label="Amanhã";
 
-            selectedDate = dataISO;
-            selectedDay = nomeDia;
-            selectedTime = "";
+btn.innerHTML=`${label}<span>${nome} - ${formatBR(d)}</span>`;
 
-            await generateTimes();
-          };
+btn.onclick=async()=>{
+document.querySelectorAll(".day-btn").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
 
-          daysContainer.appendChild(btn);
-          diasCriados++;
-        }
+selectedDate=btn.dataset.date;
+selectedDay=btn.dataset.day;
+await gerarHorarios();
+};
 
-        contador++;
-      }
-    }
+daysContainer.appendChild(btn);
+diasCriados++;
+}
+cont++;
+}
+}
 
-    async function buscarHorariosOcupados(barberId, appointmentDate) {
-      const { data, error } = await supabaseClient
-        .from("appointments")
-        .select("appointment_time")
-        .eq("barber_id", barberId)
-        .eq("appointment_date", appointmentDate);
+async function buscarOcupados(){
+const {data}=await supabaseClient
+.from("appointments")
+.select("appointment_time")
+.eq("barber_id",barberId)
+.eq("appointment_date",selectedDate);
 
-      if (error) {
-        console.error("Erro ao buscar horários ocupados:", error);
-        return [];
-      }
+return data.map(i=>i.appointment_time);
+}
 
-      return data.map(item => item.appointment_time);
-    }
+async function gerarHorarios(){
+timesContainer.innerHTML="";
 
-    async function generateTimes() {
-      timesContainer.innerHTML = "";
-      selectedTime = "";
+let start=9,end=19;
+if(selectedDay==="Segunda-feira"){start=14;end=20;}
 
-      if (!barberId || !barbeiro) {
-        timesMessage.innerText = "Barbeiro não identificado. Volte e selecione um barbeiro novamente.";
-        timesMessage.style.display = "block";
-        return;
-      }
+let ocupados=await buscarOcupados();
+let agora=new Date();
+let hoje=formatISO(agora);
 
-      if (!selectedDate || !selectedDay) {
-        timesMessage.innerText = "Selecione um dia";
-        timesMessage.style.display = "block";
-        return;
-      }
+let current=new Date();
+current.setHours(start,0,0,0);
 
-      let start = 9;
-      let end = 19;
+let limit=new Date();
+limit.setHours(end,0,0,0);
 
-      if (selectedDay === "Segunda-feira") {
-        start = 14;
-        end = 20;
-      }
+while(current<limit){
+let h=String(current.getHours()).padStart(2,"0");
+let m=String(current.getMinutes()).padStart(2,"0");
+let time=`${h}:${m}`;
 
-      const horariosOcupados = await buscarHorariosOcupados(barberId, selectedDate);
+let passado=(selectedDate===hoje && current<agora);
+let ocupado=ocupados.includes(time)||passado;
 
-      const agora = new Date();
-      const hojeISO = formatarDataISO(agora);
+let btn=document.createElement("button");
+btn.className=ocupado?"time-btn ocupado":"time-btn";
+btn.innerText=ocupado?`${time}\nIndisponível`:time;
+btn.disabled=ocupado;
 
-      let current = new Date();
-      current.setHours(start, 0, 0, 0);
+if(!ocupado){
+btn.onclick=()=>{
+document.querySelectorAll(".time-btn").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+selectedTime=time;
+};
+}
 
-      let limit = new Date();
-      limit.setHours(end, 0, 0, 0);
+timesContainer.appendChild(btn);
+current.setMinutes(current.getMinutes()+40);
+}
 
-      while (current < limit) {
-        const h = String(current.getHours()).padStart(2, "0");
-        const m = String(current.getMinutes()).padStart(2, "0");
-        const time = `${h}:${m}`;
+timesMessage.style.display="none";
+}
 
-        let horarioPassado = false;
+agendaForm.onsubmit=async(e)=>{
+e.preventDefault();
 
-        if (selectedDate === hojeISO) {
-          horarioPassado = current < agora;
-        }
+let nome=document.getElementById("nome").value;
+let apelido=document.getElementById("apelido").value;
+let whatsapp=document.getElementById("whatsapp").value;
 
-        const ocupado = horariosOcupados.includes(time) || horarioPassado;
+if(!selectedTime){
+show("Selecione horário","error");
+return;
+}
 
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = ocupado ? "time-btn ocupado" : "time-btn";
-        btn.innerText = ocupado ? `${time}\nIndisponível` : time;
-        btn.disabled = ocupado;
+dadosCliente={nome,apelido,whatsapp};
 
-        if (!ocupado) {
-          btn.onclick = () => {
-            document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            selectedTime = time;
-          };
-        }
+submitBtn.disabled=true;
 
-        timesContainer.appendChild(btn);
-        current.setMinutes(current.getMinutes() + 40);
-      }
+const {error}=await supabaseClient.from("appointments").insert([{
+barber_id:barberId,
+barber_name:barbeiro,
+customer_name:nome,
+customer_nickname:apelido,
+customer_whatsapp:whatsapp,
+weekday:selectedDay,
+appointment_date:selectedDate,
+appointment_time:selectedTime,
+status:"novo"
+}]);
 
-      timesMessage.style.display = "none";
-    }
+if(error){
+show("Erro ao salvar","error");
+submitBtn.disabled=false;
+return;
+}
 
-    agendaForm.onsubmit = async (e) => {
-      e.preventDefault();
+show("Agendamento salvo!","success");
+cancelBtn.style.display="block";
 
-      const nome = document.getElementById("nome").value.trim();
-      const apelido = document.getElementById("apelido").value.trim();
-      const whatsapp = document.getElementById("whatsapp").value.trim();
+window.scrollTo({top:0,behavior:"smooth"});
+};
 
-      if (!selectedDate || !selectedDay || !selectedTime) {
-        show("Selecione dia e horário.", "error");
-        return;
-      }
+cancelBtn.onclick=()=>{
+const mensagem=`
+Olá! Quero desmarcar meu horário.
 
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Salvando...";
+Nome: ${dadosCliente.nome}
+Barbeiro: ${barbeiro}
+Data: ${selectedDay} - ${selectedDate}
+Horário: ${selectedTime}
+`;
 
-      const { error } = await supabaseClient.from("appointments").insert([{
-        barber_id: barberId,
-        barber_name: barbeiro,
-        customer_name: nome,
-        customer_nickname: apelido,
-        customer_whatsapp: whatsapp,
-        weekday: selectedDay,
-        appointment_date: selectedDate,
-        appointment_time: selectedTime,
-        status: "novo"
-      }]);
+const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+window.open(url,"_blank");
+};
 
-      if (error) {
-        console.error("Erro ao salvar:", error);
+function show(t,type){
+const msg=document.getElementById("msg");
+msg.innerText=t;
+msg.className="msg "+type;
+}
 
-        if (error.code === "23505") {
-          show("Esse horário acabou de ser ocupado. Escolha outro horário.", "error");
-          await generateTimes();
-        } else {
-          show("Erro ao salvar agendamento.", "error");
-        }
+gerarDias();
+</script>
 
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Confirmar";
-        return;
-      }
-
-      show("Agendamento salvo com sucesso!", "success");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-
-      agendaForm.reset();
-      selectedDate = "";
-      selectedDay = "";
-      selectedTime = "";
-      timesContainer.innerHTML = "";
-      timesMessage.innerText = "Selecione um dia";
-      timesMessage.style.display = "block";
-
-      document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
-
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Confirmar";
-    };
-
-    function show(text, type) {
-      const msg = document.getElementById("msg");
-      msg.innerText = text;
-      msg.className = "msg " + type;
-    }
-
-    gerarDias();
-  </script>
 </body>
 </html>
