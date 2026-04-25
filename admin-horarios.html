@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Admin Horários | Barbearia BDC</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -87,26 +86,14 @@
       color: #000;
     }
 
-    .btn-primary:hover {
-      background: #f1cf5a;
-    }
-
     .btn-danger {
       background: #b91c1c;
       color: #fff;
     }
 
-    .btn-danger:hover {
-      background: #dc2626;
-    }
-
     .btn-secondary {
       background: #222;
       color: #fff;
-    }
-
-    .btn-secondary:hover {
-      background: #333;
     }
 
     .btn-whatsapp {
@@ -152,16 +139,12 @@
       padding: 5px 9px;
       border-radius: 999px;
       font-size: 12px;
-      background: #1f2937;
+      background: #14532d;
       color: #fff;
     }
 
     .status.cancelado {
       background: #7f1d1d;
-    }
-
-    .status.agendado {
-      background: #14532d;
     }
 
     .empty {
@@ -225,7 +208,7 @@
     <label>Senha do administrador</label>
     <input type="password" id="adminPassword" placeholder="Digite a senha" />
 
-    <button class="btn-primary" onclick="login()">Entrar</button>
+    <button type="button" class="btn-primary" onclick="login()">Entrar</button>
   </div>
 
   <div id="adminScreen" class="container hidden">
@@ -235,7 +218,7 @@
         <p style="color:#aaa;">Gerenciamento de horários e agendamentos</p>
       </div>
 
-      <button class="btn-secondary" onclick="logout()">Sair</button>
+      <button type="button" class="btn-secondary" onclick="logout()">Sair</button>
     </header>
 
     <div class="card">
@@ -266,7 +249,7 @@
           </select>
         </div>
 
-        <button class="btn-primary" onclick="loadAppointments()">Buscar</button>
+        <button type="button" class="btn-primary" onclick="loadAppointments()">Buscar</button>
       </div>
     </div>
 
@@ -293,7 +276,7 @@
           </select>
         </div>
 
-        <button class="btn-primary" onclick="createAppointment()">Adicionar</button>
+        <button type="button" class="btn-primary" onclick="createAppointment()">Adicionar</button>
       </div>
 
       <div class="filters" style="margin-top: 12px;">
@@ -346,13 +329,7 @@
 
     const ADMIN_PASSWORD = "Brunin123*";
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
-    const loginScreen = document.getElementById("loginScreen");
-    const adminScreen = document.getElementById("adminScreen");
+    let supabaseClient = null;
 
     function login() {
       const password = document.getElementById("adminPassword").value;
@@ -368,15 +345,32 @@
 
     function logout() {
       localStorage.removeItem("bdc_admin_horarios");
-      loginScreen.classList.remove("hidden");
-      adminScreen.classList.add("hidden");
+
+      document.getElementById("loginScreen").classList.remove("hidden");
+      document.getElementById("adminScreen").classList.add("hidden");
     }
 
     function showAdmin() {
-      loginScreen.classList.add("hidden");
-      adminScreen.classList.remove("hidden");
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("adminScreen").classList.remove("hidden");
+
       setToday();
+      initSupabase();
       loadAppointments();
+    }
+
+    function initSupabase() {
+      if (supabaseClient) return;
+
+      if (!window.supabase) {
+        alert("Erro: Supabase não carregou. Verifique sua internet ou o script CDN.");
+        return;
+      }
+
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
     }
 
     function setToday() {
@@ -413,32 +407,6 @@
       });
     }
 
-    function normalizeStatus(status) {
-      if (!status) return "scheduled";
-
-      return status;
-    }
-
-    function statusLabel(status) {
-      const value = normalizeStatus(status);
-
-      if (value === "cancelled") return "Cancelado";
-      if (value === "canceled") return "Cancelado";
-      if (value === "scheduled") return "Agendado";
-
-      return value;
-    }
-
-    function statusClass(status) {
-      const value = normalizeStatus(status);
-
-      if (value === "cancelled" || value === "canceled") {
-        return "cancelado";
-      }
-
-      return "agendado";
-    }
-
     function getClientName(item) {
       return (
         item.customer_name ||
@@ -459,7 +427,21 @@
       );
     }
 
+    function statusLabel(status) {
+      if (status === "cancelled" || status === "canceled") return "Cancelado";
+      return "Agendado";
+    }
+
+    function statusClass(status) {
+      if (status === "cancelled" || status === "canceled") return "cancelado";
+      return "";
+    }
+
     async function loadAppointments() {
+      initSupabase();
+
+      if (!supabaseClient) return;
+
       const loading = document.getElementById("loading");
       const empty = document.getElementById("empty");
       const table = document.getElementById("appointmentsTable");
@@ -474,18 +456,15 @@
       const filterBarber = document.getElementById("filterBarber").value;
       const filterStatus = document.getElementById("filterStatus").value;
 
-      let query = supabase
+      let query = supabaseClient
         .from("appointments")
         .select("*")
         .order("appointment_date", { ascending: true });
 
       if (filterDate) {
-        const startDate = `${filterDate}T00:00:00`;
-        const endDate = `${filterDate}T23:59:59`;
-
         query = query
-          .gte("appointment_date", startDate)
-          .lte("appointment_date", endDate);
+          .gte("appointment_date", `${filterDate}T00:00:00`)
+          .lte("appointment_date", `${filterDate}T23:59:59`);
       }
 
       if (filterBarber) {
@@ -516,7 +495,7 @@
 
         const whatsapp = getWhatsapp(item);
         const clientName = getClientName(item);
-        const status = normalizeStatus(item.status);
+        const status = item.status || "scheduled";
 
         tr.innerHTML = `
           <td data-label="Data">${formatDate(item.appointment_date)}</td>
@@ -529,15 +508,15 @@
           </td>
           <td data-label="Ações">
             <div class="actions">
-              <button class="btn-whatsapp" onclick="openWhatsapp('${whatsapp}', '${clientName}', '${item.barber_id || ""}')">
+              <button type="button" class="btn-whatsapp" onclick="openWhatsapp('${whatsapp}', '${clientName}', '${item.barber_id || ""}')">
                 WhatsApp
               </button>
 
-              <button class="btn-secondary" onclick="cancelAppointment('${item.id}')">
+              <button type="button" class="btn-secondary" onclick="cancelAppointment('${item.id}')">
                 Cancelar
               </button>
 
-              <button class="btn-danger" onclick="deleteAppointment('${item.id}')">
+              <button type="button" class="btn-danger" onclick="deleteAppointment('${item.id}')">
                 Excluir
               </button>
             </div>
@@ -551,6 +530,10 @@
     }
 
     async function createAppointment() {
+      initSupabase();
+
+      if (!supabaseClient) return;
+
       const date = document.getElementById("newDate").value;
       const time = document.getElementById("newTime").value;
       const barber = document.getElementById("newBarber").value;
@@ -565,7 +548,7 @@
 
       const appointmentDate = `${date}T${time}:00`;
 
-      const fullPayload = {
+      const payload = {
         appointment_date: appointmentDate,
         barber_id: barber,
         customer_name: name || null,
@@ -574,24 +557,9 @@
         status: "scheduled"
       };
 
-      let { error } = await supabase
+      const { error } = await supabaseClient
         .from("appointments")
-        .insert([fullPayload]);
-
-      if (error) {
-        console.warn("Tentando inserir somente campos básicos:", error.message);
-
-        const basicPayload = {
-          appointment_date: appointmentDate,
-          barber_id: barber
-        };
-
-        const basicResult = await supabase
-          .from("appointments")
-          .insert([basicPayload]);
-
-        error = basicResult.error;
-      }
+        .insert([payload]);
 
       if (error) {
         console.error(error);
@@ -610,22 +578,22 @@
     }
 
     async function cancelAppointment(id) {
-      const confirmCancel = confirm(
-        "Deseja marcar este agendamento como cancelado?"
-      );
+      initSupabase();
+
+      if (!supabaseClient) return;
+
+      const confirmCancel = confirm("Deseja marcar este agendamento como cancelado?");
 
       if (!confirmCancel) return;
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from("appointments")
         .update({ status: "cancelled" })
         .eq("id", id);
 
       if (error) {
-        alert(
-          "Não consegui marcar como cancelado. Talvez sua tabela não tenha a coluna status. Use o botão Excluir para liberar o horário."
-        );
         console.error(error);
+        alert("Erro ao cancelar. Se sua tabela não tiver a coluna status, use Excluir.");
         return;
       }
 
@@ -634,13 +602,15 @@
     }
 
     async function deleteAppointment(id) {
-      const confirmDelete = confirm(
-        "Deseja excluir este agendamento? Isso libera o horário na agenda."
-      );
+      initSupabase();
+
+      if (!supabaseClient) return;
+
+      const confirmDelete = confirm("Deseja excluir este agendamento? Isso libera o horário.");
 
       if (!confirmDelete) return;
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from("appointments")
         .delete()
         .eq("id", id);
@@ -675,6 +645,14 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      const input = document.getElementById("adminPassword");
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          login();
+        }
+      });
+
       if (localStorage.getItem("bdc_admin_horarios") === "true") {
         showAdmin();
       }
