@@ -118,19 +118,23 @@
 
     /* BOTÃO */
     .btn {
-      position: relative;
-      z-index: 3;
-      padding: 14px 28px;
-      border-radius: 12px;
-      border: 2px solid #d4af37;
-      color: #d4af37;
-      font-weight: bold;
-      font-size: 16px;
-      text-decoration: none;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      transition: .2s;
-    }
+  position: absolute;
+  bottom: 30px; /* controla a distância do fundo */
+  left: 50%;
+  transform: translateX(-50%);
+
+  z-index: 3;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  transition: .2s;
+}
 
     .btn:hover {
       background: #d4af37;
