@@ -319,11 +319,13 @@
 }
     daysButtons.forEach(button => {
       button.addEventListener("click", () => {
-        daysButtons.forEach(btn => btn.classList.remove("active"));
-        button.classList.add("active");
-        selectedDay = button.dataset.day;
-      });
-    });
+  daysButtons.forEach(btn => btn.classList.remove("active"));
+  button.classList.add("active");
+
+  selectedDay = button.dataset.day;
+
+  generateTimes(selectedDay); // 👈 aqui está o segredo
+});
 
     form.addEventListener("submit", async function(event) {
       event.preventDefault();
