@@ -14,16 +14,31 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f1cf5a;
+      --bg: #050505;
+      --card: #111;
+      --card-soft: #151515;
+      --border: #252525;
+      --muted: #aaa;
+      --danger: #b91c1c;
+      --success: #14532d;
+      --whatsapp: #25d366;
+    }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #050505;
+      background:
+        radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 35%),
+        var(--bg);
       color: #fff;
       min-height: 100vh;
       padding: 20px;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
     }
 
@@ -34,19 +49,34 @@
       gap: 16px;
       margin-bottom: 24px;
       flex-wrap: wrap;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
     }
 
     h1 {
-      font-size: 26px;
-      color: #d4af37;
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: 0.3px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 14px;
     }
 
     .card {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 14px;
+      background: linear-gradient(180deg, var(--card), #0b0b0b);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 20px;
       margin-bottom: 20px;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
     }
 
     .login-box {
@@ -54,44 +84,61 @@
       margin: 80px auto;
     }
 
+    .login-box h1 {
+      margin-bottom: 8px;
+    }
+
     label {
       display: block;
       margin-bottom: 6px;
-      font-size: 14px;
+      font-size: 13px;
       color: #ccc;
+      font-weight: bold;
     }
 
     input,
     select {
       width: 100%;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid #333;
-      background: #000;
+      background: #050505;
       color: #fff;
       margin-bottom: 14px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(212,175,55,0.15);
     }
 
     button {
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 11px 16px;
       cursor: pointer;
       font-weight: bold;
       transition: 0.2s;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
     }
 
     .btn-primary {
-      background: #d4af37;
+      background: var(--gold);
       color: #000;
     }
 
     .btn-primary:hover {
-      background: #f1cf5a;
+      background: var(--gold-light);
     }
 
     .btn-danger {
-      background: #b91c1c;
+      background: var(--danger);
       color: #fff;
     }
 
@@ -109,8 +156,42 @@
     }
 
     .btn-whatsapp {
-      background: #25d366;
+      background: var(--whatsapp);
       color: #000;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .summary-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 24px;
+      color: var(--gold);
     }
 
     .filters {
@@ -120,24 +201,54 @@
       align-items: end;
     }
 
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
+      min-width: 850px;
     }
 
     th,
     td {
-      padding: 12px;
-      border-bottom: 1px solid #222;
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
       text-align: left;
       font-size: 14px;
+      vertical-align: middle;
     }
 
     th {
-      color: #d4af37;
-      font-size: 13px;
+      color: var(--gold);
+      font-size: 12px;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #0b0b0b;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:hover {
+      background: rgba(212,175,55,0.04);
     }
 
     .actions {
@@ -148,11 +259,12 @@
 
     .status {
       display: inline-block;
-      padding: 5px 9px;
+      padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
-      background: #14532d;
+      background: var(--success);
       color: #fff;
+      font-weight: bold;
     }
 
     .status.cancelado {
@@ -160,7 +272,7 @@
     }
 
     .empty {
-      color: #aaa;
+      color: var(--muted);
       padding: 20px 0;
     }
 
@@ -168,8 +280,42 @@
       display: none;
     }
 
-    @media (max-width: 800px) {
-      .filters {
+    .small-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filters,
+      .form-grid,
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions {
+        width: 100%;
+      }
+
+      .top-actions button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .summary-grid {
         grid-template-columns: 1fr;
       }
 
@@ -180,6 +326,7 @@
       td,
       tr {
         display: block;
+        min-width: unset;
       }
 
       thead {
@@ -188,8 +335,8 @@
 
       tr {
         background: #0b0b0b;
-        border: 1px solid #222;
-        border-radius: 12px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
         margin-bottom: 12px;
         padding: 12px;
       }
@@ -203,8 +350,13 @@
         content: attr(data-label);
         display: block;
         font-size: 12px;
-        color: #d4af37;
+        color: var(--gold);
         margin-bottom: 3px;
+        font-weight: bold;
+      }
+
+      .actions button {
+        width: 100%;
       }
     }
   </style>
@@ -213,28 +365,53 @@
 <body>
   <div id="loginScreen" class="login-box card">
     <h1>Admin Horários</h1>
-    <p style="color:#aaa; margin: 12px 0 20px;">
-      Acesso restrito da Barbearia BDC.
-    </p>
+    <p class="subtitle">Acesso restrito da Barbearia BDC.</p>
 
     <label>Senha do administrador</label>
     <input type="password" id="adminPassword" placeholder="Digite a senha" />
 
-    <button type="button" class="btn-primary" onclick="login()">Entrar</button>
+    <button type="button" class="btn-primary" onclick="login()" style="width:100%;">
+      Entrar
+    </button>
   </div>
 
   <div id="adminScreen" class="container hidden">
     <header>
       <div>
         <h1>Agenda Admin</h1>
-        <p style="color:#aaa;">Gerenciamento de horários e agendamentos</p>
+        <p class="subtitle">Gerenciamento de horários e agendamentos</p>
       </div>
 
-      <button type="button" class="btn-secondary" onclick="logout()">Sair</button>
+      <div class="top-actions">
+        <button type="button" class="btn-secondary" onclick="loadAppointments()">Atualizar</button>
+        <button type="button" class="btn-secondary" onclick="logout()">Sair</button>
+      </div>
     </header>
 
+    <section class="summary-grid">
+      <div class="summary-card">
+        <span>Total do filtro</span>
+        <strong id="totalCount">0</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Agendados</span>
+        <strong id="scheduledCount">0</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Cancelados</span>
+        <strong id="cancelledCount">0</strong>
+      </div>
+
+      <div class="summary-card">
+        <span>Data selecionada</span>
+        <strong id="selectedDateLabel">Hoje</strong>
+      </div>
+    </section>
+
     <div class="card">
-      <h2 style="margin-bottom: 16px;">Filtros</h2>
+      <h2>Filtros</h2>
 
       <div class="filters">
         <div>
@@ -265,9 +442,9 @@
     </div>
 
     <div class="card">
-      <h2 style="margin-bottom: 16px;">Novo agendamento manual</h2>
+      <h2>Novo agendamento manual</h2>
 
-      <div class="filters">
+      <div class="form-grid">
         <div>
           <label>Data</label>
           <input type="date" id="newDate" />
@@ -289,7 +466,7 @@
         <button type="button" class="btn-primary" onclick="createAppointment()">Adicionar</button>
       </div>
 
-      <div class="filters" style="margin-top: 12px;">
+      <div class="form-grid-2">
         <div>
           <label>Nome do cliente</label>
           <input type="text" id="newName" placeholder="Ex: João" />
@@ -304,32 +481,34 @@
           <label>Observação</label>
           <input type="text" id="newNote" placeholder="Opcional" />
         </div>
-
-        <div></div>
       </div>
+
+      <p class="small-note">Dica: use apenas números no WhatsApp para abrir corretamente a conversa.</p>
     </div>
 
     <div class="card">
       <h2>Agendamentos</h2>
 
-      <div id="loading" class="empty hidden">Carregando...</div>
-      <div id="empty" class="empty hidden">Nenhum agendamento encontrado.</div>
+      <div id="loading" class="empty hidden">Carregando agendamentos...</div>
+      <div id="empty" class="empty hidden">Nenhum agendamento encontrado para os filtros selecionados.</div>
 
-      <table id="appointmentsTable" class="hidden">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Horário</th>
-            <th>Barbeiro</th>
-            <th>Cliente</th>
-            <th>WhatsApp</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
+      <div class="table-wrapper">
+        <table id="appointmentsTable" class="hidden">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Horário</th>
+              <th>Barbeiro</th>
+              <th>Cliente</th>
+              <th>WhatsApp</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-        <tbody id="appointmentsBody"></tbody>
-      </table>
+          <tbody id="appointmentsBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -402,6 +581,21 @@
       if (!document.getElementById("newDate").value) {
         document.getElementById("newDate").value = today;
       }
+
+      updateSelectedDateLabel();
+    }
+
+    function updateSelectedDateLabel() {
+      const dateValue = document.getElementById("filterDate").value;
+      const label = document.getElementById("selectedDateLabel");
+
+      if (!dateValue) {
+        label.textContent = "Todas";
+        return;
+      }
+
+      const [year, month, day] = dateValue.split("-");
+      label.textContent = `${day}/${month}`;
     }
 
     function formatDate(dateValue) {
@@ -456,6 +650,18 @@
       return "";
     }
 
+    function updateCounters(data) {
+      const total = data.length;
+      const cancelled = data.filter(item => item.status === "cancelled" || item.status === "canceled").length;
+      const scheduled = total - cancelled;
+
+      document.getElementById("totalCount").textContent = total;
+      document.getElementById("scheduledCount").textContent = scheduled;
+      document.getElementById("cancelledCount").textContent = cancelled;
+
+      updateSelectedDateLabel();
+    }
+
     async function loadAppointments() {
       initSupabase();
 
@@ -504,6 +710,8 @@
         return;
       }
 
+      updateCounters(data || []);
+
       if (!data || data.length === 0) {
         empty.classList.remove("hidden");
         return;
@@ -519,7 +727,7 @@
 
         tr.innerHTML = `
           <td data-label="Data">${formatDate(item.appointment_date)}</td>
-          <td data-label="Horário">${formatTime(item.appointment_date)}</td>
+          <td data-label="Horário"><strong>${formatTime(item.appointment_date)}</strong></td>
           <td data-label="Barbeiro">${barberName}</td>
           <td data-label="Cliente">${clientName}</td>
           <td data-label="WhatsApp">${whatsapp}</td>
@@ -672,6 +880,8 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
           login();
         }
       });
+
+      document.getElementById("filterDate").addEventListener("change", updateSelectedDateLabel);
 
       if (localStorage.getItem("bdc_admin_horarios") === "true") {
         showAdmin();
