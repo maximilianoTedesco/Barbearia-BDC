@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Admin Horários | Barbearia BDC</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #050505;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #d4af37;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .login-box {
+      max-width: 420px;
+      margin: 80px auto;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #000;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: #d4af37;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #f1cf5a;
+    }
+
+    .btn-danger {
+      background: #b91c1c;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: #333;
+    }
+
+    .btn-whatsapp {
+      background: #25d366;
+      color: #000;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #222;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: #d4af37;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #1f2937;
+      color: #fff;
+    }
+
+    .status.cancelado {
+      background: #7f1d1d;
+    }
+
+    .status.agendado {
+      background: #14532d;
+    }
+
+    .empty {
+      color: #aaa;
+      padding: 20px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 800px) {
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        background: #0b0b0b;
+        border: 1px solid #222;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 12px;
+      }
+
+      td {
+        border: none;
+        padding: 8px 0;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 12px;
+        color: #d4af37;
+        margin-bottom: 3px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loginScreen" class="login-box card">
+    <h1>Admin Horários</h1>
+    <p style="color:#aaa; margin: 12px 0 20px;">
+      Acesso restrito da Barbearia BDC.
+    </p>
+
+    <label>Senha do administrador</label>
+    <input type="password" id="adminPassword" placeholder="Digite a senha" />
+
+    <button class="btn-primary" onclick="login()">Entrar</button>
+  </div>
+
+  <div id="adminScreen" class="container hidden">
+    <header>
+      <div>
+        <h1>Agenda Admin</h1>
+        <p style="color:#aaa;">Gerenciamento de horários e agendamentos</p>
+      </div>
+
+      <button class="btn-secondary" onclick="logout()">Sair</button>
+    </header>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">Filtros</h2>
+
+      <div class="filters">
+        <div>
+          <label>Data</label>
+          <input type="date" id="filterDate" />
+        </div>
+
+        <div>
+          <label>Barbeiro</label>
+          <select id="filterBarber">
+            <option value="">Todos</option>
+            <option value="brunin">Brunin</option>
+            <option value="maxy">Maxy</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="filterStatus">
+            <option value="">Todos</option>
+            <option value="scheduled">Agendado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" onclick="loadAppointments()">Buscar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-bottom: 16px;">Novo agendamento manual</h2>
+
+      <div class="filters">
+        <div>
+          <label>Data</label>
+          <input type="date" id="newDate" />
+        </div>
+
+        <div>
+          <label>Horário</label>
+          <input type="time" id="newTime" />
+        </div>
+
+        <div>
+          <label>Barbeiro</label>
+          <select id="newBarber">
+            <option value="brunin">Brunin</option>
+            <option value="maxy">Maxy</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" onclick="createAppointment()">Adicionar</button>
+      </div>
+
+      <div class="filters" style="margin-top: 12px;">
+        <div>
+          <label>Nome do cliente</label>
+          <input type="text" id="newName" placeholder="Ex: João" />
+        </div>
+
+        <div>
+          <label>WhatsApp</label>
+          <input type="text" id="newWhatsapp" placeholder="Ex: 51999999999" />
+        </div>
+
+        <div>
+          <label>Observação</label>
+          <input type="text" id="newNote" placeholder="Opcional" />
+        </div>
+
+        <div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Agendamentos</h2>
+
+      <div id="loading" class="empty hidden">Carregando...</div>
+      <div id="empty" class="empty hidden">Nenhum agendamento encontrado.</div>
+
+      <table id="appointmentsTable" class="hidden">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Horário</th>
+            <th>Barbeiro</th>
+            <th>Cliente</th>
+            <th>WhatsApp</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody id="appointmentsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
+
+    const ADMIN_PASSWORD = "1234";
+
+    const supabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const loginScreen = document.getElementById("loginScreen");
+    const adminScreen = document.getElementById("adminScreen");
+
+    function login() {
+      const password = document.getElementById("adminPassword").value;
+
+      if (password !== ADMIN_PASSWORD) {
+        alert("Senha incorreta.");
+        return;
+      }
+
+      localStorage.setItem("bdc_admin_horarios", "true");
+      showAdmin();
+    }
+
+    function logout() {
+      localStorage.removeItem("bdc_admin_horarios");
+      loginScreen.classList.remove("hidden");
+      adminScreen.classList.add("hidden");
+    }
+
+    function showAdmin() {
+      loginScreen.classList.add("hidden");
+      adminScreen.classList.remove("hidden");
+      setToday();
+      loadAppointments();
+    }
+
+    function setToday() {
+      const today = new Date().toISOString().split("T")[0];
+
+      if (!document.getElementById("filterDate").value) {
+        document.getElementById("filterDate").value = today;
+      }
+
+      if (!document.getElementById("newDate").value) {
+        document.getElementById("newDate").value = today;
+      }
+    }
+
+    function formatDate(dateValue) {
+      if (!dateValue) return "-";
+
+      const date = new Date(dateValue);
+
+      return date.toLocaleDateString("pt-BR", {
+        timeZone: "America/Sao_Paulo"
+      });
+    }
+
+    function formatTime(dateValue) {
+      if (!dateValue) return "-";
+
+      const date = new Date(dateValue);
+
+      return date.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "America/Sao_Paulo"
+      });
+    }
+
+    function normalizeStatus(status) {
+      if (!status) return "scheduled";
+
+      return status;
+    }
+
+    function statusLabel(status) {
+      const value = normalizeStatus(status);
+
+      if (value === "cancelled") return "Cancelado";
+      if (value === "canceled") return "Cancelado";
+      if (value === "scheduled") return "Agendado";
+
+      return value;
+    }
+
+    function statusClass(status) {
+      const value = normalizeStatus(status);
+
+      if (value === "cancelled" || value === "canceled") {
+        return "cancelado";
+      }
+
+      return "agendado";
+    }
+
+    function getClientName(item) {
+      return (
+        item.customer_name ||
+        item.client_name ||
+        item.name ||
+        item.nome ||
+        "-"
+      );
+    }
+
+    function getWhatsapp(item) {
+      return (
+        item.customer_whatsapp ||
+        item.whatsapp ||
+        item.phone ||
+        item.telefone ||
+        "-"
+      );
+    }
+
+    async function loadAppointments() {
+      const loading = document.getElementById("loading");
+      const empty = document.getElementById("empty");
+      const table = document.getElementById("appointmentsTable");
+      const body = document.getElementById("appointmentsBody");
+
+      loading.classList.remove("hidden");
+      empty.classList.add("hidden");
+      table.classList.add("hidden");
+      body.innerHTML = "";
+
+      const filterDate = document.getElementById("filterDate").value;
+      const filterBarber = document.getElementById("filterBarber").value;
+      const filterStatus = document.getElementById("filterStatus").value;
+
+      let query = supabase
+        .from("appointments")
+        .select("*")
+        .order("appointment_date", { ascending: true });
+
+      if (filterDate) {
+        const startDate = `${filterDate}T00:00:00`;
+        const endDate = `${filterDate}T23:59:59`;
+
+        query = query
+          .gte("appointment_date", startDate)
+          .lte("appointment_date", endDate);
+      }
+
+      if (filterBarber) {
+        query = query.eq("barber_id", filterBarber);
+      }
+
+      if (filterStatus) {
+        query = query.eq("status", filterStatus);
+      }
+
+      const { data, error } = await query;
+
+      loading.classList.add("hidden");
+
+      if (error) {
+        console.error(error);
+        alert("Erro ao carregar agendamentos: " + error.message);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      data.forEach((item) => {
+        const tr = document.createElement("tr");
+
+        const whatsapp = getWhatsapp(item);
+        const clientName = getClientName(item);
+        const status = normalizeStatus(item.status);
+
+        tr.innerHTML = `
+          <td data-label="Data">${formatDate(item.appointment_date)}</td>
+          <td data-label="Horário">${formatTime(item.appointment_date)}</td>
+          <td data-label="Barbeiro">${item.barber_id || "-"}</td>
+          <td data-label="Cliente">${clientName}</td>
+          <td data-label="WhatsApp">${whatsapp}</td>
+          <td data-label="Status">
+            <span class="status ${statusClass(status)}">${statusLabel(status)}</span>
+          </td>
+          <td data-label="Ações">
+            <div class="actions">
+              <button class="btn-whatsapp" onclick="openWhatsapp('${whatsapp}', '${clientName}', '${item.barber_id || ""}')">
+                WhatsApp
+              </button>
+
+              <button class="btn-secondary" onclick="cancelAppointment('${item.id}')">
+                Cancelar
+              </button>
+
+              <button class="btn-danger" onclick="deleteAppointment('${item.id}')">
+                Excluir
+              </button>
+            </div>
+          </td>
+        `;
+
+        body.appendChild(tr);
+      });
+
+      table.classList.remove("hidden");
+    }
+
+    async function createAppointment() {
+      const date = document.getElementById("newDate").value;
+      const time = document.getElementById("newTime").value;
+      const barber = document.getElementById("newBarber").value;
+      const name = document.getElementById("newName").value.trim();
+      const whatsapp = document.getElementById("newWhatsapp").value.trim();
+      const note = document.getElementById("newNote").value.trim();
+
+      if (!date || !time || !barber) {
+        alert("Preencha data, horário e barbeiro.");
+        return;
+      }
+
+      const appointmentDate = `${date}T${time}:00`;
+
+      const fullPayload = {
+        appointment_date: appointmentDate,
+        barber_id: barber,
+        customer_name: name || null,
+        customer_whatsapp: whatsapp || null,
+        note: note || null,
+        status: "scheduled"
+      };
+
+      let { error } = await supabase
+        .from("appointments")
+        .insert([fullPayload]);
+
+      if (error) {
+        console.warn("Tentando inserir somente campos básicos:", error.message);
+
+        const basicPayload = {
+          appointment_date: appointmentDate,
+          barber_id: barber
+        };
+
+        const basicResult = await supabase
+          .from("appointments")
+          .insert([basicPayload]);
+
+        error = basicResult.error;
+      }
+
+      if (error) {
+        console.error(error);
+        alert("Erro ao criar agendamento: " + error.message);
+        return;
+      }
+
+      alert("Agendamento criado com sucesso.");
+
+      document.getElementById("newTime").value = "";
+      document.getElementById("newName").value = "";
+      document.getElementById("newWhatsapp").value = "";
+      document.getElementById("newNote").value = "";
+
+      loadAppointments();
+    }
+
+    async function cancelAppointment(id) {
+      const confirmCancel = confirm(
+        "Deseja marcar este agendamento como cancelado?"
+      );
+
+      if (!confirmCancel) return;
+
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled" })
+        .eq("id", id);
+
+      if (error) {
+        alert(
+          "Não consegui marcar como cancelado. Talvez sua tabela não tenha a coluna status. Use o botão Excluir para liberar o horário."
+        );
+        console.error(error);
+        return;
+      }
+
+      alert("Agendamento cancelado.");
+      loadAppointments();
+    }
+
+    async function deleteAppointment(id) {
+      const confirmDelete = confirm(
+        "Deseja excluir este agendamento? Isso libera o horário na agenda."
+      );
+
+      if (!confirmDelete) return;
+
+      const { error } = await supabase
+        .from("appointments")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error(error);
+        alert("Erro ao excluir agendamento: " + error.message);
+        return;
+      }
+
+      alert("Agendamento excluído.");
+      loadAppointments();
+    }
+
+    function openWhatsapp(phone, name, barber) {
+      if (!phone || phone === "-") {
+        alert("Este agendamento não possui WhatsApp cadastrado.");
+        return;
+      }
+
+      const cleanPhone = phone.replace(/\D/g, "");
+
+      const message = `Olá, ${name}! Tudo bem?
+
+Aqui é da Barbearia BDC.
+
+Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
+
+      const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
+
+      window.open(url, "_blank");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("bdc_admin_horarios") === "true") {
+        showAdmin();
+      }
+    });
+  </script>
+</body>
+</html>
