@@ -418,7 +418,7 @@ grid-template-columns:1fr 1fr;
 
 <main class="agenda-box">
 
-<div id="popupConfirmacao" class="popup-overlay">
+<div id="popupConfirmacao" class="popup-overlay" tabindex="-1">
   <div class="popup-box">
     <div class="popup-icon">✓</div>
     <h3>Agendamento confirmado!</h3>
@@ -772,6 +772,12 @@ return;
 window.scrollTo(0, 0); // sobe instantaneamente
 
 popupConfirmacao.style.display="flex";
+
+// foca no popup
+popupConfirmacao.focus();
+
+// impede scroll da página
+document.body.style.overflow = "hidden";
 };
 
 cancelBtn.onclick=()=>{
