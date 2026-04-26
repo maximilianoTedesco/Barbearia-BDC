@@ -445,8 +445,22 @@ Barbeiro: ${barbeiro}
 };
 
 popupOkBtn.onclick=()=>{
+const nome = document.getElementById("nome").value;
+
+const mensagem = `Acabei de agendar um horário com o barbeiro ${barbeiro}.
+Dia: ${selectedDay}
+Horário: ${selectedTime}
+Cliente: ${nome}`;
+
+const url = `https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+
+window.open(url, "_blank");
+
+setTimeout(()=>{
 window.location.reload();
+},1000);
 };
+  
 function show(t,type){
 const msg=document.getElementById("msg");
 msg.innerText=t;
