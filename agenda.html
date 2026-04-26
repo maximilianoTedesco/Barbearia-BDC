@@ -35,6 +35,13 @@ font-weight:800;
 font-size:14px;
 }
 
+  .trust-text{
+text-align:center;
+font-size:13px;
+color:#aaa;
+margin-top:8px;
+}
+  
 header{
 text-align:center;
 margin-bottom:26px;
@@ -453,15 +460,18 @@ grid-template-columns:1fr 1fr;
 </div>
 
 <div class="actions">
-<button class="submit-btn" id="submitBtn">Confirmar agendamento</button>
+<button class="submit-btn" id="submitBtn">Confirmar horário</button>
 
 <button type="button" id="cancelWhatsappBtn" class="whatsapp-btn">
 Desmarcar pelo WhatsApp
 </button>
 </div>
-
+<p class="trust-text">
+Sem compromisso • Leva menos de 1 minuto
+</p>
+  
 <button type="button" id="chemistryWhatsappBtn" class="chemistry-btn">
-Para luzes, platinados ou químicas em geral, clique aqui e fale no WhatsApp
+Para luzes, platinado ou químicas, fale direto no WhatsApp
 </button>
 
 <p id="msg" class="msg"></p>
@@ -681,7 +691,16 @@ document.querySelectorAll(".time-btn").forEach(b=>b.classList.remove("active"));
 btn.classList.add("active");
 selectedTime=time;
 atualizarResumo();
+
+if(navigator.vibrate){
+navigator.vibrate(50);
+}
+
 rolarParaFormulario();
+
+setTimeout(()=>{
+document.getElementById("nome").focus();
+},500);
 };
 }
 
@@ -725,7 +744,7 @@ const disponivel=await horarioAindaDisponivel();
 if(!disponivel){
 show("Este horário acabou de ser preenchido. Escolha outro horário.","error");
 submitBtn.disabled=false;
-submitBtn.innerText="Confirmar agendamento";
+submitBtn.innerText="Confirmar horário";
 await gerarHorarios();
 return;
 }
@@ -746,7 +765,7 @@ if(error){
 console.error("Erro ao salvar agendamento:",error);
 show("Erro ao salvar. Tente novamente.","error");
 submitBtn.disabled=false;
-submitBtn.innerText="Confirmar agendamento";
+submitBtn.innerText="Confirmar horário";
 return;
 }
 
