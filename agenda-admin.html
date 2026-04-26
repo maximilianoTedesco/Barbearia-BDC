@@ -297,8 +297,8 @@
         </div>
 
         <div class="full">
-          <label for="observation">Observação</label>
-          <textarea id="observation" placeholder="Opcional"></textarea>
+          <label for="observation">Observação interna</label>
+          <textarea id="observation" placeholder="Opcional — não será salvo no banco por enquanto"></textarea>
         </div>
       </div>
 
@@ -346,28 +346,12 @@
     };
 
     const AVAILABLE_HOURS = [
-      "09:00",
-      "09:30",
-      "10:00",
-      "10:30",
-      "11:00",
-      "11:30",
-      "12:00",
-      "12:30",
-      "13:00",
-      "13:30",
-      "14:00",
-      "14:30",
-      "15:00",
-      "15:30",
-      "16:00",
-      "16:30",
-      "17:00",
-      "17:30",
-      "18:00",
-      "18:30",
-      "19:00",
-      "19:30"
+      "09:00", "09:30", "10:00", "10:30",
+      "11:00", "11:30", "12:00", "12:30",
+      "13:00", "13:30", "14:00", "14:30",
+      "15:00", "15:30", "16:00", "16:30",
+      "17:00", "17:30", "18:00", "18:30",
+      "19:00", "19:30"
     ];
 
     let supabaseClient = null;
@@ -415,6 +399,23 @@
       return BARBERS[barberId] || "";
     }
 
+    function getWeekdayName(dateValue) {
+      const [year, month, day] = dateValue.split("-");
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+      const weekdays = [
+        "Domingo",
+        "Segunda-feira",
+        "Terça-feira",
+        "Quarta-feira",
+        "Quinta-feira",
+        "Sexta-feira",
+        "Sábado"
+      ];
+
+      return weekdays[date.getDay()];
+    }
+
     function updateSelectedInfo() {
       const date = document.getElementById("appointmentDate").value;
       const barber = getBarberName();
@@ -427,10 +428,11 @@
       }
 
       const [year, month, day] = date.split("-");
+      const weekday = getWeekdayName(date);
 
       info.innerHTML = `
         <strong>Resumo:</strong><br>
-        Data: ${day}/${month}/${year}<br>
+        Data: ${day}/${month}/${year} - ${weekday}<br>
         Horário: ${selectedHour}<br>
         Barbeiro: ${barber}
       `;
@@ -458,6 +460,8 @@
         }
 
         button.addEventListener("click", () => {
+          if (button.disabled) return;
+
           selectedHour = hour;
           renderHours();
           updateSelectedInfo();
@@ -498,7 +502,9 @@
         return;
       }
 
-      busyHours = (data || []).map((item) => item.appointment_time);
+      busyHours = (data || [])
+        .map((item) => item.appointment_time)
+        .filter(Boolean);
 
       renderHours();
       updateSelectedInfo();
@@ -519,7 +525,6 @@
       const barberName = getBarberName();
       const clientName = document.getElementById("clientName").value.trim();
       const clientWhatsapp = onlyNumbers(document.getElementById("clientWhatsapp").value);
-      const observation = document.getElementById("observation").value.trim();
 
       if (!appointmentDate) {
         showMessage("Selecione a data do agendamento.", "error");
@@ -561,14 +566,17 @@
       }
 
       if (existing) {
-        showMessage("Este horário acabou de ser ocupado. Atualize os horários e escolha outro.", "error");
+        showMessage("Este horário já está ocupado. Atualize os horários e escolha outro.", "error");
         await loadBusyHours();
         return;
       }
 
+      const weekday = getWeekdayName(appointmentDate);
+
       const newAppointment = {
         appointment_date: appointmentDate,
         appointment_time: selectedHour,
+        weekday: weekday,
         barber_id: barberId,
         barber_name: barberName,
         customer_name: clientName,
