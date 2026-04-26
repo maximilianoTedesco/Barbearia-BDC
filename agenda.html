@@ -191,7 +191,6 @@ color:#000;
 font-weight:bold;
 cursor:pointer;
 }
-  
 </style>
 </head>
 
@@ -214,7 +213,7 @@ cursor:pointer;
     <button id="popupOkBtn">OK</button>
   </div>
 </div>
-  
+
 <h2 class="section-title">Escolha o dia</h2>
 <div id="days" class="days"></div>
 
@@ -228,6 +227,7 @@ cursor:pointer;
 <input id="nome" placeholder="Nome completo" required />
 <input id="apelido" placeholder="Apelido" required />
 <input id="whatsapp" placeholder="WhatsApp" required />
+
 <button class="submit-btn" id="submitBtn">Confirmar</button>
 
 <button type="button" id="cancelWhatsappBtn" class="whatsapp-btn">
@@ -269,9 +269,17 @@ let selectedDate="";
 let selectedDay="";
 let selectedTime="";
 
-barberSelected.innerText=barbeiro;
+barberSelected.innerText=barbeiro || "";
 
-const diasSemana=["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"];
+const diasSemana=[
+"Domingo",
+"Segunda-feira",
+"Terça-feira",
+"Quarta-feira",
+"Quinta-feira",
+"Sexta-feira",
+"Sábado"
+];
 
 function formatISO(d){
 return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -279,6 +287,25 @@ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.
 
 function formatBR(d){
 return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+function normalizarHorario(time){
+if(!time)return "";
+return String(time).slice(0,5);
+}
+
+function statusOcupaHorario(status){
+if(!status)return true;
+
+const s=String(status).toLowerCase().trim();
+
+if(s==="cancelled")return false;
+if(s==="canceled")return false;
+if(s==="cancelado")return false;
+if(s==="excluido")return false;
+if(s==="deleted")return false;
+
+return true;
 }
 
 function rolarParaHorarios(){
@@ -291,13 +318,15 @@ block:"start"
 }
 
 function gerarDias(){
-let diasCriados=0,cont=0;
+let diasCriados=0;
+let cont=0;
 
 while(diasCriados<7){
 let d=new Date();
 d.setDate(d.getDate()+cont);
 
 let nome=diasSemana[d.getDay()];
+
 if(nome!=="Domingo"){
 let btn=document.createElement("button");
 btn.className="day-btn";
@@ -325,6 +354,7 @@ rolarParaHorarios();
 daysContainer.appendChild(btn);
 diasCriados++;
 }
+
 cont++;
 }
 }
@@ -334,25 +364,32 @@ const {data,error}=await supabaseClient
 .from("appointments")
 .select("appointment_time,status")
 .eq("barber_id",barberId)
-.eq("appointment_date",selectedDate)
-.neq("status","cancelled")
-.neq("status","canceled");
+.eq("appointment_date",selectedDate);
 
 if(error){
 console.error("Erro ao buscar horários ocupados:",error);
 return [];
 }
 
-return data.map(i=>i.appointment_time);
+return (data || [])
+.filter(item=>statusOcupaHorario(item.status))
+.map(item=>normalizarHorario(item.appointment_time));
 }
 
 async function gerarHorarios(){
 timesContainer.innerHTML="";
+timesMessage.style.display="none";
 
-let start=9,end=19;
-if(selectedDay==="Segunda-feira"){start=14;end=20;}
+let start=9;
+let end=19;
+
+if(selectedDay==="Segunda-feira"){
+start=14;
+end=20;
+}
 
 let ocupados=await buscarOcupados();
+
 let agora=new Date();
 let hoje=formatISO(agora);
 
@@ -386,23 +423,42 @@ selectedTime=time;
 timesContainer.appendChild(btn);
 current.setMinutes(current.getMinutes()+40);
 }
+}
 
-timesMessage.style.display="none";
+async function horarioAindaDisponivel(){
+const ocupados=await buscarOcupados();
+return !ocupados.includes(selectedTime);
 }
 
 agendaForm.onsubmit=async(e)=>{
 e.preventDefault();
 
-let nome=document.getElementById("nome").value;
-let apelido=document.getElementById("apelido").value;
-let whatsapp=document.getElementById("whatsapp").value;
+let nome=document.getElementById("nome").value.trim();
+let apelido=document.getElementById("apelido").value.trim();
+let whatsapp=document.getElementById("whatsapp").value.trim();
+
+if(!selectedDate || !selectedDay){
+show("Selecione um dia.","error");
+return;
+}
 
 if(!selectedTime){
-show("Selecione horário","error");
+show("Selecione um horário.","error");
 return;
 }
 
 submitBtn.disabled=true;
+submitBtn.innerText="Salvando...";
+
+const disponivel=await horarioAindaDisponivel();
+
+if(!disponivel){
+show("Este horário acabou de ser preenchido. Escolha outro horário.","error");
+submitBtn.disabled=false;
+submitBtn.innerText="Confirmar";
+await gerarHorarios();
+return;
+}
 
 const {error}=await supabaseClient.from("appointments").insert([{
 barber_id:barberId,
@@ -417,57 +473,57 @@ status:"novo"
 }]);
 
 if(error){
-show("Erro ao salvar","error");
+console.error("Erro ao salvar agendamento:",error);
+show("Erro ao salvar. Tente novamente.","error");
 submitBtn.disabled=false;
+submitBtn.innerText="Confirmar";
 return;
 }
 
 popupConfirmacao.style.display="flex";
 };
 
-cancelBtn.onclick = () => {
-  const nome = document.getElementById("nome").value.trim();
-  const whatsapp = document.getElementById("whatsapp").value.trim();
+cancelBtn.onclick=()=>{
+const nome=document.getElementById("nome").value.trim();
+const whatsapp=document.getElementById("whatsapp").value.trim();
 
-  if (!nome) {
-    show("Informe seu nome para solicitar a desmarcação.", "error");
-    return;
-  }
+if(!nome){
+show("Informe seu nome para solicitar a desmarcação.","error");
+return;
+}
 
-  if (!whatsapp) {
-    show("Informe seu WhatsApp para solicitar a desmarcação.", "error");
-    return;
-  }
+if(!whatsapp){
+show("Informe seu WhatsApp para solicitar a desmarcação.","error");
+return;
+}
 
-  const mensagem = `
-Olá! Quero desmarcar meu horário.
+const mensagem=`Olá! Quero desmarcar meu horário.
 
 Nome: ${nome}
 WhatsApp: ${whatsapp}
-Barbeiro: ${barbeiro}
-`;
+Barbeiro: ${barbeiro}`;
 
-  const url = `https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
-  window.open(url, "_blank");
+const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+window.open(url,"_blank");
 };
 
 popupOkBtn.onclick=()=>{
-const nome = document.getElementById("nome").value;
+const nome=document.getElementById("nome").value.trim();
 
-const mensagem = `Acabei de agendar um horário com o barbeiro ${barbeiro}.
+const mensagem=`Acabei de agendar um horário com o barbeiro ${barbeiro}.
 Dia: ${selectedDay}
 Horário: ${selectedTime}
 Cliente: ${nome}`;
 
-const url = `https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
 
-window.open(url, "_blank");
+window.open(url,"_blank");
 
 setTimeout(()=>{
 window.location.reload();
 },1000);
 };
-  
+
 function show(t,type){
 const msg=document.getElementById("msg");
 msg.innerText=t;
