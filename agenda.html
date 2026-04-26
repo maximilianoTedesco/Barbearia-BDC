@@ -330,11 +330,18 @@ cont++;
 }
 
 async function buscarOcupados(){
-const {data}=await supabaseClient
+const {data,error}=await supabaseClient
 .from("appointments")
-.select("appointment_time")
+.select("appointment_time,status")
 .eq("barber_id",barberId)
-.eq("appointment_date",selectedDate);
+.eq("appointment_date",selectedDate)
+.neq("status","cancelled")
+.neq("status","canceled");
+
+if(error){
+console.error("Erro ao buscar horários ocupados:",error);
+return [];
+}
 
 return data.map(i=>i.appointment_time);
 }
