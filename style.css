@@ -88,12 +88,29 @@ body {
 .hero-logo h1 {
   font-size: clamp(38px, 10vw, 56px);
   font-weight: 900;
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   line-height: 0.95;
   text-transform: uppercase;
+
+  background: linear-gradient(
+    135deg,
+    #fff3c4 0%,
+    #f5d28a 20%,
+    #d6a84f 40%,
+    #b98224 60%,
+    #f5d28a 80%,
+    #fff3c4 100%
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
   text-shadow:
-    0 3px 12px rgba(0, 0, 0, 0.9),
-    0 0 28px rgba(0, 0, 0, 0.65);
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    0 4px 12px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(214, 168, 79, 0.25);
+
+  position: relative;
 }
 
 .hero-logo p {
