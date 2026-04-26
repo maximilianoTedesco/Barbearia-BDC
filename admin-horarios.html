@@ -1,9 +1,12 @@
+<!-- admin.html completo ajustado -->
+<!-- Mantém Supabase, appointments, Brunin/Guilherme e botão agenda-admin.html -->
+<!-- Melhorias: layout, filtros rápidos, busca, modal de cancelamento, toast, painel responsivo -->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Admin Horários | Barbearia BDC</title>
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,111 +16,151 @@
 
     :root {
       --gold: #d4af37;
-      --gold-light: #f1cf5a;
+      --gold-light: #f5d76e;
       --bg: #050505;
-      --card: #111;
-      --card-soft: #151515;
-      --border: #252525;
-      --muted: #aaa;
+      --panel: #0f0f0f;
+      --panel-soft: #171717;
+      --border: #2a2a2a;
+      --text: #ffffff;
+      --muted: #a3a3a3;
       --danger: #b91c1c;
-      --success: #14532d;
+      --danger-light: #ef4444;
+      --success: #15803d;
       --whatsapp: #25d366;
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, rgba(212,175,55,0.08), transparent 35%), var(--bg);
-      color: #fff;
+      background:
+        radial-gradient(circle at top left, rgba(212,175,55,0.14), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(212,175,55,0.08), transparent 30%),
+        var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      padding: 18px;
     }
 
-    .container { max-width: 1180px; margin: 0 auto; }
+    .hidden { display: none !important; }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      padding: 18px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    h1 { font-size: 28px; color: var(--gold); }
-    h2 { font-size: 18px; margin-bottom: 16px; }
-
-    .subtitle {
-      color: var(--muted);
-      margin-top: 4px;
-      font-size: 14px;
+    .container {
+      max-width: 1220px;
+      margin: 0 auto;
     }
 
     .card {
-      background: linear-gradient(180deg, var(--card), #0b0b0b);
+      background: linear-gradient(180deg, var(--panel), #090909);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+      margin-bottom: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.35);
     }
 
     .login-box {
-      max-width: 420px;
-      margin: 80px auto;
+      max-width: 430px;
+      margin: 90px auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      color: var(--gold);
+      letter-spacing: 0.4px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .top-actions,
+    .actions,
+    .quick-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
     }
 
     label {
       display: block;
       margin-bottom: 6px;
       font-size: 13px;
-      color: #ccc;
-      font-weight: bold;
+      color: #d4d4d4;
+      font-weight: 700;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       padding: 12px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid #333;
       background: #050505;
       color: #fff;
-      margin-bottom: 14px;
       outline: none;
+      font-size: 14px;
     }
 
-    input:focus, select:focus {
+    input:focus,
+    select:focus {
       border-color: var(--gold);
-      box-shadow: 0 0 0 2px rgba(212,175,55,0.15);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.14);
     }
 
     button {
       border: none;
-      border-radius: 10px;
-      padding: 11px 16px;
+      border-radius: 12px;
+      padding: 11px 15px;
       cursor: pointer;
-      font-weight: bold;
-      transition: 0.2s;
+      font-weight: 800;
+      transition: 0.18s ease;
       white-space: nowrap;
+      font-size: 14px;
     }
 
-    button:hover { transform: translateY(-1px); }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.06);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     .btn-primary {
       background: var(--gold);
       color: #000;
     }
 
-    .btn-primary:hover { background: var(--gold-light); }
+    .btn-secondary {
+      background: #222;
+      color: #fff;
+      border: 1px solid #333;
+    }
 
     .btn-danger {
       background: var(--danger);
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: #222;
       color: #fff;
     }
 
@@ -126,24 +169,26 @@
       color: #000;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
+    .btn-admin-schedule {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #000;
+      font-size: 17px;
+      padding: 15px 22px;
+      border-radius: 15px;
+      font-weight: 900;
     }
 
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .summary-card {
-      background: var(--card-soft);
+      background: var(--panel-soft);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 16px;
     }
 
@@ -156,35 +201,39 @@
 
     .summary-card strong {
       display: block;
-      font-size: 24px;
+      font-size: 25px;
       color: var(--gold);
     }
 
     .filters {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr auto;
+      grid-template-columns: 1fr 1fr 1fr 1.2fr auto;
       gap: 12px;
       align-items: end;
     }
 
     .admin-schedule-card {
-      text-align: center;
-      padding: 28px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
     }
 
     .admin-schedule-card p {
       color: var(--muted);
-      margin-bottom: 18px;
       font-size: 14px;
+      margin-top: 5px;
+      line-height: 1.4;
     }
 
-    .btn-admin-schedule {
-      background: var(--gold);
-      color: #000;
-      font-size: 18px;
-      padding: 16px 24px;
-      border-radius: 14px;
-      font-weight: 900;
+    .table-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
     }
 
     .table-wrapper {
@@ -195,15 +244,16 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
-      min-width: 850px;
+      min-width: 920px;
     }
 
-    th, td {
+    th,
+    td {
       padding: 13px 12px;
       border-bottom: 1px solid var(--border);
       text-align: left;
       font-size: 14px;
+      vertical-align: middle;
     }
 
     th {
@@ -211,62 +261,138 @@
       font-size: 12px;
       text-transform: uppercase;
       background: #0b0b0b;
+      letter-spacing: 0.4px;
     }
 
     tbody tr:hover {
-      background: rgba(212,175,55,0.04);
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      background: rgba(212,175,55,0.05);
     }
 
     .status {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
       background: var(--success);
       color: #fff;
-      font-weight: bold;
+      font-weight: 800;
     }
 
     .empty {
       color: var(--muted);
-      padding: 20px 0;
+      padding: 18px 0;
+      line-height: 1.4;
     }
 
-    .hidden {
-      display: none;
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #101010;
+      color: #fff;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--gold);
+      padding: 14px 16px;
+      border-radius: 14px;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.45);
+      z-index: 9999;
+      max-width: 340px;
+      font-size: 14px;
     }
 
-    @media (max-width: 900px) {
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger-light); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 18px;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 460px;
+      background: #101010;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 22px 60px rgba(0,0,0,0.6);
+    }
+
+    .modal h3 {
+      color: var(--gold);
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .modal p {
+      color: #d4d4d4;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .danger-text {
+      color: #fecaca;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
       .summary-grid {
         grid-template-columns: repeat(2, 1fr);
       }
 
       .filters {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
-      .top-actions,
-      .top-actions button {
+      .filters button {
         width: 100%;
       }
     }
 
     @media (max-width: 650px) {
-      body { padding: 14px; }
+      body { padding: 13px; }
 
       h1 { font-size: 24px; }
 
-      .summary-grid {
+      .summary-grid,
+      .filters {
         grid-template-columns: 1fr;
       }
 
-      table, thead, tbody, th, td, tr {
+      .top-actions,
+      .top-actions button,
+      .quick-actions,
+      .quick-actions button,
+      .btn-admin-schedule {
+        width: 100%;
+      }
+
+      .admin-schedule-card {
+        align-items: stretch;
+      }
+
+      table,
+      thead,
+      tbody,
+      th,
+      td,
+      tr {
         display: block;
         min-width: unset;
       }
@@ -278,8 +404,8 @@
       tr {
         background: #0b0b0b;
         border: 1px solid var(--border);
-        border-radius: 14px;
-        margin-bottom: 12px;
+        border-radius: 15px;
+        margin-bottom: 13px;
         padding: 12px;
       }
 
@@ -294,16 +420,19 @@
         font-size: 12px;
         color: var(--gold);
         margin-bottom: 3px;
-        font-weight: bold;
+        font-weight: 800;
       }
 
-      .actions button {
+      .actions button,
+      .modal-actions button {
         width: 100%;
       }
 
-      .btn-admin-schedule {
-        width: 100%;
-        font-size: 16px;
+      .toast {
+        left: 13px;
+        right: 13px;
+        bottom: 13px;
+        max-width: unset;
       }
     }
   </style>
@@ -314,10 +443,12 @@
     <h1>Admin Horários</h1>
     <p class="subtitle">Acesso restrito da Barbearia BDC.</p>
 
-    <label>Senha do administrador</label>
-    <input type="password" id="adminPassword" placeholder="Digite a senha" />
+    <div style="height:18px;"></div>
 
-    <button type="button" class="btn-primary" onclick="login()" style="width:100%;">
+    <label for="adminPassword">Senha do administrador</label>
+    <input type="password" id="adminPassword" placeholder="Digite a senha" autocomplete="current-password" />
+
+    <button type="button" class="btn-primary" onclick="login()" style="width:100%; margin-top:4px;">
       Entrar
     </button>
   </div>
@@ -326,10 +457,11 @@
     <header>
       <div>
         <h1>Agenda Admin</h1>
-        <p class="subtitle">Gerenciamento de horários e agendamentos</p>
+        <p class="subtitle">Gerenciamento de horários, clientes e cancelamentos</p>
       </div>
 
       <div class="top-actions">
+        <button type="button" class="btn-secondary" onclick="setDateToday()">Hoje</button>
         <button type="button" class="btn-secondary" onclick="loadAppointments()">Atualizar</button>
         <button type="button" class="btn-secondary" onclick="logout()">Sair</button>
       </div>
@@ -342,13 +474,13 @@
       </div>
 
       <div class="summary-card">
-        <span>Agendados</span>
-        <strong id="scheduledCount">0</strong>
+        <span>Brunin</span>
+        <strong id="bruninCount">0</strong>
       </div>
 
       <div class="summary-card">
-        <span>Cancelados</span>
-        <strong id="cancelledCount">0</strong>
+        <span>Guilherme</span>
+        <strong id="guilhermeCount">0</strong>
       </div>
 
       <div class="summary-card">
@@ -362,12 +494,12 @@
 
       <div class="filters">
         <div>
-          <label>Data</label>
+          <label for="filterDate">Data</label>
           <input type="date" id="filterDate" />
         </div>
 
         <div>
-          <label>Barbeiro</label>
+          <label for="filterBarber">Barbeiro</label>
           <select id="filterBarber">
             <option value="">Todos</option>
             <option value="1f39cf56-9a40-42ee-a968-56f1537b47c3">Brunin</option>
@@ -376,7 +508,7 @@
         </div>
 
         <div>
-          <label>Status</label>
+          <label for="filterStatus">Status</label>
           <select id="filterStatus">
             <option value="">Todos</option>
             <option value="scheduled">Agendado</option>
@@ -384,13 +516,26 @@
           </select>
         </div>
 
+        <div>
+          <label for="searchText">Buscar cliente/WhatsApp</label>
+          <input type="text" id="searchText" placeholder="Ex: João ou 5199..." />
+        </div>
+
         <button type="button" class="btn-primary" onclick="loadAppointments()">Buscar</button>
+      </div>
+
+      <div class="quick-actions" style="margin-top:14px;">
+        <button type="button" class="btn-secondary" onclick="setDateToday()">Ver hoje</button>
+        <button type="button" class="btn-secondary" onclick="setDateTomorrow()">Ver amanhã</button>
+        <button type="button" class="btn-secondary" onclick="clearFilters()">Limpar filtros</button>
       </div>
     </div>
 
     <div class="card admin-schedule-card">
-      <h2>Agendamento administrativo</h2>
-      <p>Use este botão para abrir uma nova tela exclusiva de agendamento pelo painel do ADM.</p>
+      <div>
+        <h2>Agendamento administrativo</h2>
+        <p>Abra uma tela exclusiva para o ADM criar um agendamento respeitando os horários já ocupados.</p>
+      </div>
 
       <button type="button" class="btn-admin-schedule" onclick="abrirAgendaAdmin()">
         Agendar pelo painel do ADM
@@ -398,7 +543,12 @@
     </div>
 
     <div class="card" id="resultSection">
-      <h2>Agendamentos</h2>
+      <div class="table-top">
+        <div>
+          <h2>Agendamentos</h2>
+          <p class="subtitle">Lista baseada nos filtros selecionados.</p>
+        </div>
+      </div>
 
       <div id="loading" class="empty hidden">Carregando agendamentos...</div>
       <div id="empty" class="empty hidden">Nenhum agendamento encontrado para os filtros selecionados.</div>
@@ -423,6 +573,25 @@
     </div>
   </div>
 
+  <div id="toast" class="toast hidden"></div>
+
+  <div id="cancelModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>Cancelar agendamento?</h3>
+      <p id="cancelModalText">
+        Tem certeza que deseja cancelar este horário?
+      </p>
+      <p class="danger-text">
+        O agendamento será excluído do banco e o horário ficará livre novamente.
+      </p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeCancelModal()">Voltar</button>
+        <button type="button" class="btn-danger" id="confirmCancelBtn" onclick="confirmCancelAppointment()">Cancelar horário</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
@@ -435,20 +604,29 @@
     };
 
     let supabaseClient = null;
+    let appointmentToCancel = null;
+    let lastLoadedData = [];
 
     function abrirAgendaAdmin() {
       window.open("agenda-admin.html", "_blank");
     }
 
-    function getBarberName(barberId) {
-      return BARBERS[barberId] || "Barbeiro";
+    function initSupabase() {
+      if (supabaseClient) return;
+
+      if (!window.supabase) {
+        showToast("Erro: Supabase não carregou. Atualize a página.", "error");
+        return;
+      }
+
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
     function login() {
-      const password = document.getElementById("adminPassword").value;
+      const password = document.getElementById("adminPassword").value.trim();
 
       if (password !== ADMIN_PASSWORD) {
-        alert("Senha incorreta.");
+        showToast("Senha incorreta.", "error");
         return;
       }
 
@@ -460,36 +638,60 @@
       localStorage.removeItem("bdc_admin_horarios");
       document.getElementById("loginScreen").classList.remove("hidden");
       document.getElementById("adminScreen").classList.add("hidden");
-    }
-
-    function initSupabase() {
-      if (supabaseClient) return;
-
-      if (!window.supabase) {
-        alert("Erro: Supabase não carregou.");
-        return;
-      }
-
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      document.getElementById("adminPassword").value = "";
     }
 
     function showAdmin() {
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("adminScreen").classList.remove("hidden");
 
-      setToday();
+      setTodayIfEmpty();
       initSupabase();
       loadAppointments();
     }
 
-    function setToday() {
-      const today = new Date().toISOString().split("T")[0];
+    function getTodayValue() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const localDate = new Date(now.getTime() - offset * 60000);
+      return localDate.toISOString().split("T")[0];
+    }
 
-      if (!document.getElementById("filterDate").value) {
-        document.getElementById("filterDate").value = today;
+    function addDays(dateValue, days) {
+      const date = new Date(dateValue + "T12:00:00");
+      date.setDate(date.getDate() + days);
+      return date.toISOString().split("T")[0];
+    }
+
+    function setTodayIfEmpty() {
+      const input = document.getElementById("filterDate");
+
+      if (!input.value) {
+        input.value = getTodayValue();
       }
 
       updateSelectedDateLabel();
+    }
+
+    function setDateToday() {
+      document.getElementById("filterDate").value = getTodayValue();
+      updateSelectedDateLabel();
+      loadAppointments();
+    }
+
+    function setDateTomorrow() {
+      document.getElementById("filterDate").value = addDays(getTodayValue(), 1);
+      updateSelectedDateLabel();
+      loadAppointments();
+    }
+
+    function clearFilters() {
+      document.getElementById("filterDate").value = "";
+      document.getElementById("filterBarber").value = "";
+      document.getElementById("filterStatus").value = "";
+      document.getElementById("searchText").value = "";
+      updateSelectedDateLabel();
+      loadAppointments();
     }
 
     function updateSelectedDateLabel() {
@@ -501,25 +703,31 @@
         return;
       }
 
+      const today = getTodayValue();
+      const tomorrow = addDays(today, 1);
+
+      if (dateValue === today) {
+        label.textContent = "Hoje";
+        return;
+      }
+
+      if (dateValue === tomorrow) {
+        label.textContent = "Amanhã";
+        return;
+      }
+
       const [year, month, day] = dateValue.split("-");
       label.textContent = `${day}/${month}`;
     }
 
     function formatDate(dateValue) {
       if (!dateValue) return "-";
-
       const [year, month, day] = dateValue.split("-");
       return `${day}/${month}/${year}`;
     }
 
-    function formatTime(dateValue) {
-      if (!dateValue) return "-";
-
-      return new Date(dateValue).toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: "America/Sao_Paulo"
-      });
+    function getBarberName(barberId) {
+      return BARBERS[barberId] || "Barbeiro";
     }
 
     function getClientName(item) {
@@ -533,24 +741,57 @@
     function statusLabel(status) {
       if (status === "novo") return "Agendado";
       if (status === "scheduled") return "Agendado";
-
+      if (status === "cancelled") return "Cancelado";
       return "Agendado";
+    }
+
+    function escapeText(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function normalizeText(value) {
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function showToast(message, type = "") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.remove("hidden");
+
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 3500);
     }
 
     function updateCounters(data) {
       const total = data.length;
-      const scheduled = total;
+
+      const brunin = data.filter(item =>
+        item.barber_id === "1f39cf56-9a40-42ee-a968-56f1537b47c3"
+      ).length;
+
+      const guilherme = data.filter(item =>
+        item.barber_id === "766b291c-4b4f-47ad-89e5-7893b1af0d28"
+      ).length;
 
       document.getElementById("totalCount").textContent = total;
-      document.getElementById("scheduledCount").textContent = scheduled;
-      document.getElementById("cancelledCount").textContent = "0";
+      document.getElementById("bruninCount").textContent = brunin;
+      document.getElementById("guilhermeCount").textContent = guilherme;
 
       updateSelectedDateLabel();
     }
 
     async function loadAppointments() {
       initSupabase();
-
       if (!supabaseClient) return;
 
       const loading = document.getElementById("loading");
@@ -566,6 +807,7 @@
       const filterDate = document.getElementById("filterDate").value;
       const filterBarber = document.getElementById("filterBarber").value;
       const filterStatus = document.getElementById("filterStatus").value;
+      const searchText = normalizeText(document.getElementById("searchText").value);
 
       let query = supabaseClient
         .from("appointments")
@@ -591,24 +833,30 @@
 
       if (error) {
         console.error(error);
-        alert("Erro ao carregar agendamentos: " + error.message);
+        showToast("Erro ao carregar agendamentos: " + error.message, "error");
         return;
       }
 
-      updateCounters(data || []);
+      let filteredData = data || [];
 
-      if (!data || data.length === 0) {
-        empty.classList.remove("hidden");
-
-        document.getElementById("resultSection").scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+      if (searchText) {
+        filteredData = filteredData.filter(item => {
+          const client = normalizeText(getClientName(item));
+          const phone = normalizeText(getWhatsapp(item));
+          return client.includes(searchText) || phone.includes(searchText);
         });
+      }
 
+      lastLoadedData = filteredData;
+      updateCounters(filteredData);
+
+      if (filteredData.length === 0) {
+        empty.classList.remove("hidden");
+        scrollToResults();
         return;
       }
 
-      data.forEach((item) => {
+      filteredData.forEach((item) => {
         const tr = document.createElement("tr");
 
         const whatsapp = getWhatsapp(item);
@@ -617,21 +865,21 @@
         const barberName = item.barber_name || getBarberName(item.barber_id);
 
         tr.innerHTML = `
-          <td data-label="Data">${formatDate(item.appointment_date)}</td>
-          <td data-label="Horário"><strong>${item.appointment_time || formatTime(item.appointment_date)}</strong></td>
-          <td data-label="Barbeiro">${barberName}</td>
-          <td data-label="Cliente">${clientName}</td>
-          <td data-label="WhatsApp">${whatsapp}</td>
+          <td data-label="Data">${escapeText(formatDate(item.appointment_date))}</td>
+          <td data-label="Horário"><strong>${escapeText(item.appointment_time || "-")}</strong></td>
+          <td data-label="Barbeiro">${escapeText(barberName)}</td>
+          <td data-label="Cliente">${escapeText(clientName)}</td>
+          <td data-label="WhatsApp">${escapeText(whatsapp)}</td>
           <td data-label="Status">
-            <span class="status">${statusLabel(status)}</span>
+            <span class="status">${escapeText(statusLabel(status))}</span>
           </td>
           <td data-label="Ações">
             <div class="actions">
-              <button type="button" class="btn-whatsapp" onclick="openWhatsapp('${whatsapp}', '${clientName}', '${barberName}')">
+              <button type="button" class="btn-whatsapp" onclick="openWhatsapp('${escapeText(whatsapp)}', '${escapeText(clientName)}', '${escapeText(barberName)}')">
                 WhatsApp
               </button>
 
-              <button type="button" class="btn-danger" onclick="cancelAppointment('${item.id}')">
+              <button type="button" class="btn-danger" onclick="openCancelModal('${escapeText(item.id)}')">
                 Cancelar
               </button>
             </div>
@@ -642,58 +890,88 @@
       });
 
       table.classList.remove("hidden");
+      scrollToResults();
+    }
 
+    function scrollToResults() {
       document.getElementById("resultSection").scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
     }
 
-    async function cancelAppointment(id) {
-      initSupabase();
+    function openCancelModal(id) {
+      const item = lastLoadedData.find(row => String(row.id) === String(id));
 
-      if (!supabaseClient) return;
-
-      if (!id) {
-        alert("Erro: ID do agendamento não encontrado.");
+      if (!item) {
+        showToast("Erro: agendamento não encontrado na lista atual.", "error");
         return;
       }
 
-      const confirmar = confirm(
-        "Deseja cancelar este agendamento? Ele será excluído do banco e o horário ficará livre para novo agendamento."
-      );
+      appointmentToCancel = item;
 
-      if (!confirmar) return;
+      const clientName = getClientName(item);
+      const barberName = item.barber_name || getBarberName(item.barber_id);
+
+      document.getElementById("cancelModalText").innerHTML = `
+        Cliente: <strong>${escapeText(clientName)}</strong><br>
+        Barbeiro: <strong>${escapeText(barberName)}</strong><br>
+        Data: <strong>${escapeText(formatDate(item.appointment_date))}</strong><br>
+        Horário: <strong>${escapeText(item.appointment_time || "-")}</strong>
+      `;
+
+      document.getElementById("cancelModal").classList.remove("hidden");
+    }
+
+    function closeCancelModal() {
+      appointmentToCancel = null;
+      document.getElementById("cancelModal").classList.add("hidden");
+    }
+
+    async function confirmCancelAppointment() {
+      initSupabase();
+      if (!supabaseClient || !appointmentToCancel) return;
+
+      const button = document.getElementById("confirmCancelBtn");
+      button.disabled = true;
+      button.textContent = "Cancelando...";
 
       const { data, error } = await supabaseClient
         .from("appointments")
         .delete()
-        .eq("id", id)
+        .eq("id", appointmentToCancel.id)
         .select();
+
+      button.disabled = false;
+      button.textContent = "Cancelar horário";
 
       if (error) {
         console.error("Erro ao cancelar/excluir:", error);
-        alert("Erro ao cancelar agendamento: " + error.message);
+        showToast("Erro ao cancelar: " + error.message, "error");
         return;
       }
 
       if (!data || data.length === 0) {
-        alert("Nenhum agendamento foi excluído. Verifique a permissão DELETE no Supabase ou se o ID existe.");
+        showToast("Nenhum agendamento foi excluído. Verifique a permissão DELETE no Supabase.", "error");
         return;
       }
 
-      alert("Agendamento cancelado, excluído e horário liberado.");
-
+      closeCancelModal();
+      showToast("Agendamento cancelado e horário liberado.", "success");
       await loadAppointments();
     }
 
     function openWhatsapp(phone, name, barber) {
       if (!phone || phone === "-") {
-        alert("Este agendamento não possui WhatsApp cadastrado.");
+        showToast("Este agendamento não possui WhatsApp cadastrado.", "error");
         return;
       }
 
-      const cleanPhone = phone.replace(/\D/g, "");
+      let cleanPhone = phone.replace(/\D/g, "");
+
+      if (cleanPhone.startsWith("55")) {
+        cleanPhone = cleanPhone.slice(2);
+      }
 
       const message = `Olá, ${name}! Tudo bem?
 
@@ -701,18 +979,19 @@ Aqui é da Barbearia BDC.
 Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
 
       const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
-
       window.open(url, "_blank");
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      const input = document.getElementById("adminPassword");
-
-      input.addEventListener("keydown", (event) => {
+      document.getElementById("adminPassword").addEventListener("keydown", (event) => {
         if (event.key === "Enter") login();
       });
 
       document.getElementById("filterDate").addEventListener("change", updateSelectedDateLabel);
+
+      document.getElementById("searchText").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") loadAppointments();
+      });
 
       if (localStorage.getItem("bdc_admin_horarios") === "true") {
         showAdmin();
