@@ -179,11 +179,11 @@
     }
 
     .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 18px;
-    }
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
 
     .summary-card {
       background: var(--panel-soft);
@@ -474,18 +474,8 @@
   </div>
 
   <div class="summary-card">
-    <span>Total em R$</span>
-    <strong id="totalRevenue">R$ 0,00</strong>
-  </div>
-
-  <div class="summary-card">
-    <span>Brunin</span>
-    <strong id="bruninRevenue">R$ 0,00</strong>
-  </div>
-
-  <div class="summary-card">
-    <span>Guilherme</span>
-    <strong id="guilhermeRevenue">R$ 0,00</strong>
+    <span>Data selecionada</span>
+    <strong id="selectedDateLabel">Hoje</strong>
   </div>
 </section>
 
@@ -537,9 +527,15 @@
         <p>Abra uma tela exclusiva para o ADM criar um agendamento respeitando os horários já ocupados.</p>
       </div>
 
-      <button type="button" class="btn-admin-schedule" onclick="abrirAgendaAdmin()">
-        Agendar pelo painel do ADM
-      </button>
+      <div class="quick-actions">
+  <button type="button" class="btn-admin-schedule" onclick="abrirAgendaAdmin()">
+    Agendar pelo painel do ADM
+  </button>
+
+  <button type="button" class="btn-admin-schedule" onclick="abrirFinanceiro()">
+    Relatório financeiro
+  </button>
+</div>
     </div>
 
     <div class="card" id="resultSection">
@@ -610,6 +606,10 @@
 
     function abrirAgendaAdmin() {
       window.open("agenda-admin.html", "_blank");
+    }
+
+    function abrirFinanceiro() {
+      window.open("financeiro.html", "_blank");
     }
 
     function initSupabase() {
@@ -784,25 +784,7 @@
 }
 
 function updateCounters(data) {
-  const total = data.length;
-
-  const totalRevenue = data.reduce((sum, item) => {
-    return sum + Number(item.service_value || 0);
-  }, 0);
-
-  const bruninRevenue = data
-    .filter(item => item.barber_id === "1f39cf56-9a40-42ee-a968-56f1537b47c3")
-    .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
-
-  const guilhermeRevenue = data
-    .filter(item => item.barber_id === "766b291c-4b4f-47ad-89e5-7893b1af0d28")
-    .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
-
-  document.getElementById("totalCount").textContent = total;
-  document.getElementById("totalRevenue").textContent = formatMoney(totalRevenue);
-  document.getElementById("bruninRevenue").textContent = formatMoney(bruninRevenue);
-  document.getElementById("guilhermeRevenue").textContent = formatMoney(guilhermeRevenue);
-
+  document.getElementById("totalCount").textContent = data.length;
   updateSelectedDateLabel();
 }
 
