@@ -696,30 +696,33 @@
     }
 
     function updateSelectedDateLabel() {
-      const dateValue = document.getElementById("filterDate").value;
-      const label = document.getElementById("selectedDateLabel");
+  const label = document.getElementById("selectedDateLabel");
 
-      if (!dateValue) {
-        label.textContent = "Todas";
-        return;
-      }
+  if (!label) return;
 
-      const today = getTodayValue();
-      const tomorrow = addDays(today, 1);
+  const dateValue = document.getElementById("filterDate").value;
 
-      if (dateValue === today) {
-        label.textContent = "Hoje";
-        return;
-      }
+  if (!dateValue) {
+    label.textContent = "Todas";
+    return;
+  }
 
-      if (dateValue === tomorrow) {
-        label.textContent = "Amanhã";
-        return;
-      }
+  const today = getTodayValue();
+  const tomorrow = addDays(today, 1);
 
-      const [year, month, day] = dateValue.split("-");
-      label.textContent = `${day}/${month}`;
-    }
+  if (dateValue === today) {
+    label.textContent = "Hoje";
+    return;
+  }
+
+  if (dateValue === tomorrow) {
+    label.textContent = "Amanhã";
+    return;
+  }
+
+  const [year, month, day] = dateValue.split("-");
+  label.textContent = `${day}/${month}`;
+}
 
     function formatDate(dateValue) {
       if (!dateValue) return "-";
