@@ -598,12 +598,9 @@
                 WhatsApp
               </button>
 
-              <button type="button" class="btn-secondary" onclick="cancelAppointment('${item.id}')">
+              <button type="button" class="btn-danger" onclick="cancelAppointment('${item.id}')">
                 Cancelar
               </button>
-
-              <button type="button" class="btn-danger" onclick="deleteAppointment('${item.id}')">
-                Excluir
               </button>
             </div>
           </td>
@@ -690,27 +687,45 @@
       loadAppointments();
     }
 
-    async function deleteAppointment(id) {
-      initSupabase();
+    async function cancelAppointment(id) {
+  initSupabase();
 
-      if (!supabaseClient) return;
+  if (!supabaseClient) return;
 
-      if (!confirm("Deseja excluir este agendamento? Isso libera o horário.")) return;
+  if (!id) {
+    alert("Erro: ID do agendamento não encontrado.");
+    return;
+  }
 
-      const { error } = await supabaseClient
-        .from("appointments")
-        .delete()
-        .eq("id", id);
+  const confirmar = confirm(
+    "Deseja cancelar este agendamento? Ele será excluído do banco e o horário ficará livre para novo agendamento."
+  );
 
-      if (error) {
-        console.error(error);
-        alert("Erro ao excluir agendamento: " + error.message);
-        return;
-      }
+  if (!confirmar) return;
 
-      alert("Agendamento excluído e horário liberado.");
-      loadAppointments();
-    }
+  const { data, error } = await supabaseClient
+    .from("appointments")
+    .delete()
+    .eq("id", id)
+    .select();
+
+  if (error) {
+    console.error("Erro ao cancelar/excluir:", error);
+    alert("Erro ao cancelar agendamento: " + error.message);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert(
+      "Nenhum agendamento foi excluído. Provável bloqueio de permissão no Supabase ou ID não encontrado."
+    );
+    return;
+  }
+
+  alert("Agendamento cancelado, excluído e horário liberado.");
+
+  await loadAppointments();
+}
 
     function openWhatsapp(phone, name, barber) {
       if (!phone || phone === "-") {
