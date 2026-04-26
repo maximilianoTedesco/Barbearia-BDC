@@ -145,6 +145,53 @@ display:none;
 
 .msg.success{display:block;color:#4ade80;}
 .msg.error{display:block;color:#f87171;}
+
+.popup-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.75);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+padding:20px;
+}
+
+.popup-box{
+background:#111;
+border:1px solid rgba(212,175,55,.55);
+border-radius:18px;
+padding:28px;
+max-width:360px;
+width:100%;
+text-align:center;
+box-shadow:0 0 30px rgba(0,0,0,.6);
+}
+
+.popup-box h3{
+color:#d4af37;
+font-size:24px;
+margin-bottom:12px;
+}
+
+.popup-box p{
+color:#fff;
+font-size:16px;
+margin-bottom:22px;
+line-height:1.4;
+}
+
+.popup-box button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#d4af37;
+color:#000;
+font-weight:bold;
+cursor:pointer;
+}
+  
 </style>
 </head>
 
@@ -160,6 +207,14 @@ display:none;
 
 <main class="agenda-box">
 
+<div id="popupConfirmacao" class="popup-overlay">
+  <div class="popup-box">
+    <h3>Agendamento confirmado!</h3>
+    <p>Seu horário foi salvo com sucesso.</p>
+    <button id="popupOkBtn">OK</button>
+  </div>
+</div>
+  
 <h2 class="section-title">Escolha o dia</h2>
 <div id="days" class="days"></div>
 
@@ -207,6 +262,8 @@ const horariosTitulo=document.getElementById("horariosTitulo");
 const agendaForm=document.getElementById("agendaForm");
 const submitBtn=document.getElementById("submitBtn");
 const cancelBtn=document.getElementById("cancelWhatsappBtn");
+const popupConfirmacao=document.getElementById("popupConfirmacao");
+const popupOkBtn=document.getElementById("popupOkBtn");
 
 let selectedDate="";
 let selectedDay="";
@@ -358,9 +415,7 @@ submitBtn.disabled=false;
 return;
 }
 
-alert("Agendamento confirmado com sucesso!");
-
-window.location.reload();
+popupConfirmacao.style.display="flex";
 };
 
 cancelBtn.onclick = () => {
@@ -389,6 +444,9 @@ Barbeiro: ${barbeiro}
   window.open(url, "_blank");
 };
 
+popupOkBtn.onclick=()=>{
+window.location.reload();
+};
 function show(t,type){
 const msg=document.getElementById("msg");
 msg.innerText=t;
