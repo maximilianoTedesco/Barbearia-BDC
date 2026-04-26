@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Admin Horários | Barbearia BDC</title>
 
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -47,7 +48,11 @@
     h1 { font-size: 28px; color: var(--gold); }
     h2 { font-size: 18px; margin-bottom: 16px; }
 
-    .subtitle { color: var(--muted); margin-top: 4px; font-size: 14px; }
+    .subtitle {
+      color: var(--muted);
+      margin-top: 4px;
+      font-size: 14px;
+    }
 
     .card {
       background: linear-gradient(180deg, var(--card), #0b0b0b);
@@ -58,7 +63,10 @@
       box-shadow: 0 12px 35px rgba(0,0,0,0.25);
     }
 
-    .login-box { max-width: 420px; margin: 80px auto; }
+    .login-box {
+      max-width: 420px;
+      margin: 80px auto;
+    }
 
     label {
       display: block;
@@ -96,12 +104,27 @@
 
     button:hover { transform: translateY(-1px); }
 
-    .btn-primary { background: var(--gold); color: #000; }
+    .btn-primary {
+      background: var(--gold);
+      color: #000;
+    }
+
     .btn-primary:hover { background: var(--gold-light); }
 
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-secondary { background: #222; color: #fff; }
-    .btn-whatsapp { background: var(--whatsapp); color: #000; }
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #222;
+      color: #fff;
+    }
+
+    .btn-whatsapp {
+      background: var(--whatsapp);
+      color: #000;
+    }
 
     .top-actions {
       display: flex;
@@ -137,21 +160,37 @@
       color: var(--gold);
     }
 
-    .filters, .form-grid {
+    .filters {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr auto;
       gap: 12px;
       align-items: end;
     }
 
-    .form-grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
+    .admin-schedule-card {
+      text-align: center;
+      padding: 28px 20px;
     }
 
-    .table-wrapper { width: 100%; overflow-x: auto; }
+    .admin-schedule-card p {
+      color: var(--muted);
+      margin-bottom: 18px;
+      font-size: 14px;
+    }
+
+    .btn-admin-schedule {
+      background: var(--gold);
+      color: #000;
+      font-size: 18px;
+      padding: 16px 24px;
+      border-radius: 14px;
+      font-weight: 900;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
 
     table {
       width: 100%;
@@ -174,9 +213,15 @@
       background: #0b0b0b;
     }
 
-    tbody tr:hover { background: rgba(212,175,55,0.04); }
+    tbody tr:hover {
+      background: rgba(212,175,55,0.04);
+    }
 
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
     .status {
       display: inline-block;
@@ -188,32 +233,47 @@
       font-weight: bold;
     }
 
-    .empty { color: var(--muted); padding: 20px 0; }
-    .hidden { display: none; }
-
-    .small-note {
+    .empty {
       color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px;
+      padding: 20px 0;
+    }
+
+    .hidden {
+      display: none;
     }
 
     @media (max-width: 900px) {
-      .summary-grid { grid-template-columns: repeat(2, 1fr); }
-      .filters, .form-grid, .form-grid-2 { grid-template-columns: 1fr; }
-      .top-actions, .top-actions button { width: 100%; }
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .top-actions,
+      .top-actions button {
+        width: 100%;
+      }
     }
 
     @media (max-width: 650px) {
       body { padding: 14px; }
+
       h1 { font-size: 24px; }
-      .summary-grid { grid-template-columns: 1fr; }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
 
       table, thead, tbody, th, td, tr {
         display: block;
         min-width: unset;
       }
 
-      thead { display: none; }
+      thead {
+        display: none;
+      }
 
       tr {
         background: #0b0b0b;
@@ -237,7 +297,14 @@
         font-weight: bold;
       }
 
-      .actions button { width: 100%; }
+      .actions button {
+        width: 100%;
+      }
+
+      .btn-admin-schedule {
+        width: 100%;
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -321,49 +388,13 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2>Novo agendamento manual</h2>
+    <div class="card admin-schedule-card">
+      <h2>Agendamento administrativo</h2>
+      <p>Use este botão para abrir uma nova tela exclusiva de agendamento pelo painel do ADM.</p>
 
-      <div class="form-grid">
-        <div>
-          <label>Data</label>
-          <input type="date" id="newDate" />
-        </div>
-
-        <div>
-          <label>Horário</label>
-          <input type="time" id="newTime" />
-        </div>
-
-        <div>
-          <label>Barbeiro</label>
-          <select id="newBarber">
-            <option value="1f39cf56-9a40-42ee-a968-56f1537b47c3">Brunin</option>
-            <option value="766b291c-4b4f-47ad-89e5-7893b1af0d28">Guilherme</option>
-          </select>
-        </div>
-
-        <button type="button" class="btn-primary" onclick="createAppointment()">Adicionar</button>
-      </div>
-
-      <div class="form-grid-2">
-        <div>
-          <label>Nome do cliente</label>
-          <input type="text" id="newName" placeholder="Ex: João" />
-        </div>
-
-        <div>
-          <label>WhatsApp</label>
-          <input type="text" id="newWhatsapp" placeholder="Ex: 51999999999" />
-        </div>
-
-        <div>
-          <label>Observação</label>
-          <input type="text" id="newNote" placeholder="Opcional" />
-        </div>
-      </div>
-
-      <p class="small-note">Dica: use apenas números no WhatsApp para abrir corretamente a conversa.</p>
+      <button type="button" class="btn-admin-schedule" onclick="abrirAgendaAdmin()">
+        Agendar pelo painel do ADM
+      </button>
     </div>
 
     <div class="card" id="resultSection">
@@ -395,6 +426,7 @@
   <script>
     const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
+
     const ADMIN_PASSWORD = "Brunin123*";
 
     const BARBERS = {
@@ -403,6 +435,10 @@
     };
 
     let supabaseClient = null;
+
+    function abrirAgendaAdmin() {
+      window.open("agenda-admin.html", "_blank");
+    }
 
     function getBarberName(barberId) {
       return BARBERS[barberId] || "Barbeiro";
@@ -453,10 +489,6 @@
         document.getElementById("filterDate").value = today;
       }
 
-      if (!document.getElementById("newDate").value) {
-        document.getElementById("newDate").value = today;
-      }
-
       updateSelectedDateLabel();
     }
 
@@ -501,6 +533,7 @@
     function statusLabel(status) {
       if (status === "novo") return "Agendado";
       if (status === "scheduled") return "Agendado";
+
       return "Agendado";
     }
 
@@ -601,7 +634,6 @@
               <button type="button" class="btn-danger" onclick="cancelAppointment('${item.id}')">
                 Cancelar
               </button>
-              </button>
             </div>
           </td>
         `;
@@ -617,115 +649,43 @@
       });
     }
 
-    async function createAppointment() {
-      initSupabase();
-
-      if (!supabaseClient) return;
-
-      const date = document.getElementById("newDate").value;
-      const time = document.getElementById("newTime").value;
-      const barber = document.getElementById("newBarber").value;
-      const name = document.getElementById("newName").value.trim();
-      const whatsapp = document.getElementById("newWhatsapp").value.trim();
-      const note = document.getElementById("newNote").value.trim();
-
-      if (!date || !time || !barber) {
-        alert("Preencha data, horário e barbeiro.");
-        return;
-      }
-
-      const payload = {
-        appointment_date: date,
-        appointment_time: time,
-        barber_id: barber,
-        barber_name: getBarberName(barber),
-        customer_name: name || null,
-        customer_whatsapp: whatsapp || null,
-        note: note || null,
-        status: "scheduled"
-      };
-
-      const { error } = await supabaseClient
-        .from("appointments")
-        .insert([payload]);
-
-      if (error) {
-        console.error(error);
-        alert("Erro ao criar agendamento: " + error.message);
-        return;
-      }
-
-      alert("Agendamento criado com sucesso.");
-
-      document.getElementById("newTime").value = "";
-      document.getElementById("newName").value = "";
-      document.getElementById("newWhatsapp").value = "";
-      document.getElementById("newNote").value = "";
-
-      loadAppointments();
-    }
-
     async function cancelAppointment(id) {
       initSupabase();
 
       if (!supabaseClient) return;
 
-      if (!confirm("Deseja cancelar este agendamento? Ele será excluído e o horário ficará livre para novo agendamento.")) return;
+      if (!id) {
+        alert("Erro: ID do agendamento não encontrado.");
+        return;
+      }
 
-      const { error } = await supabaseClient
+      const confirmar = confirm(
+        "Deseja cancelar este agendamento? Ele será excluído do banco e o horário ficará livre para novo agendamento."
+      );
+
+      if (!confirmar) return;
+
+      const { data, error } = await supabaseClient
         .from("appointments")
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .select();
 
       if (error) {
-        console.error(error);
-        alert("Erro ao cancelar/excluir agendamento: " + error.message);
+        console.error("Erro ao cancelar/excluir:", error);
+        alert("Erro ao cancelar agendamento: " + error.message);
         return;
       }
 
-      alert("Agendamento cancelado e horário liberado para novo agendamento.");
-      loadAppointments();
+      if (!data || data.length === 0) {
+        alert("Nenhum agendamento foi excluído. Verifique a permissão DELETE no Supabase ou se o ID existe.");
+        return;
+      }
+
+      alert("Agendamento cancelado, excluído e horário liberado.");
+
+      await loadAppointments();
     }
-
-    async function cancelAppointment(id) {
-  initSupabase();
-
-  if (!supabaseClient) return;
-
-  if (!id) {
-    alert("Erro: ID do agendamento não encontrado.");
-    return;
-  }
-
-  const confirmar = confirm(
-    "Deseja cancelar este agendamento? Ele será excluído do banco e o horário ficará livre para novo agendamento."
-  );
-
-  if (!confirmar) return;
-
-  const { data, error } = await supabaseClient
-    .from("appointments")
-    .delete()
-    .eq("id", id)
-    .select();
-
-  if (error) {
-    console.error("Erro ao cancelar/excluir:", error);
-    alert("Erro ao cancelar agendamento: " + error.message);
-    return;
-  }
-
-  if (!data || data.length === 0) {
-    alert(
-      "Nenhum agendamento foi excluído. Provável bloqueio de permissão no Supabase ou ID não encontrado."
-    );
-    return;
-  }
-
-  alert("Agendamento cancelado, excluído e horário liberado.");
-
-  await loadAppointments();
-}
 
     function openWhatsapp(phone, name, barber) {
       if (!phone || phone === "-") {
@@ -738,10 +698,10 @@
       const message = `Olá, ${name}! Tudo bem?
 
 Aqui é da Barbearia BDC.
-
 Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
 
       const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
+
       window.open(url, "_blank");
     }
 
