@@ -92,15 +92,31 @@ body {
   line-height: 0.95;
   text-transform: uppercase;
 
+  /* DOURADO INTERNO */
   background: linear-gradient(
-    135deg,
+    to bottom,
     #fff3c4 0%,
-    #f5d28a 20%,
-    #d6a84f 40%,
-    #b98224 60%,
-    #f5d28a 80%,
-    #fff3c4 100%
+    #f5d28a 25%,
+    #d6a84f 50%,
+    #b98224 75%,
+    #7a4e12 100%
   );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* BORDA ESCURA (CHAVE DO EFEITO) */
+  -webkit-text-stroke: 1.5px #2b1a05;
+
+  /* PROFUNDIDADE 3D */
+  text-shadow:
+    0 1px 0 #000,
+    0 2px 0 #000,
+    0 3px 0 #000,
+    0 4px 0 #000,
+    0 6px 10px rgba(0,0,0,0.9),
+    0 0 12px rgba(214,168,79,0.3);
+}
 
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
