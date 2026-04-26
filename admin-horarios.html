@@ -468,26 +468,26 @@
     </header>
 
     <section class="summary-grid">
-      <div class="summary-card">
-        <span>Total do filtro</span>
-        <strong id="totalCount">0</strong>
-      </div>
+  <div class="summary-card">
+    <span>Total do filtro</span>
+    <strong id="totalCount">0</strong>
+  </div>
 
-      <div class="summary-card">
-        <span>Brunin</span>
-        <strong id="bruninCount">0</strong>
-      </div>
+  <div class="summary-card">
+    <span>Total em R$</span>
+    <strong id="totalRevenue">R$ 0,00</strong>
+  </div>
 
-      <div class="summary-card">
-        <span>Guilherme</span>
-        <strong id="guilhermeCount">0</strong>
-      </div>
+  <div class="summary-card">
+    <span>Brunin</span>
+    <strong id="bruninRevenue">R$ 0,00</strong>
+  </div>
 
-      <div class="summary-card">
-        <span>Data selecionada</span>
-        <strong id="selectedDateLabel">Hoje</strong>
-      </div>
-    </section>
+  <div class="summary-card">
+    <span>Guilherme</span>
+    <strong id="guilhermeRevenue">R$ 0,00</strong>
+  </div>
+</section>
 
     <div class="card">
       <h2>Filtros</h2>
@@ -562,6 +562,7 @@
               <th>Barbeiro</th>
               <th>Cliente</th>
               <th>WhatsApp</th>
+              <th>Valor</th>
               <th>Status</th>
               <th>Ações</th>
             </tr>
@@ -772,23 +773,35 @@
       }, 3500);
     }
 
-    function updateCounters(data) {
-      const total = data.length;
+    function formatMoney(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
 
-      const brunin = data.filter(item =>
-        item.barber_id === "1f39cf56-9a40-42ee-a968-56f1537b47c3"
-      ).length;
+function updateCounters(data) {
+  const total = data.length;
 
-      const guilherme = data.filter(item =>
-        item.barber_id === "766b291c-4b4f-47ad-89e5-7893b1af0d28"
-      ).length;
+  const totalRevenue = data.reduce((sum, item) => {
+    return sum + Number(item.service_value || 0);
+  }, 0);
 
-      document.getElementById("totalCount").textContent = total;
-      document.getElementById("bruninCount").textContent = brunin;
-      document.getElementById("guilhermeCount").textContent = guilherme;
+  const bruninRevenue = data
+    .filter(item => item.barber_id === "1f39cf56-9a40-42ee-a968-56f1537b47c3")
+    .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
 
-      updateSelectedDateLabel();
-    }
+  const guilhermeRevenue = data
+    .filter(item => item.barber_id === "766b291c-4b4f-47ad-89e5-7893b1af0d28")
+    .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
+
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("totalRevenue").textContent = formatMoney(totalRevenue);
+  document.getElementById("bruninRevenue").textContent = formatMoney(bruninRevenue);
+  document.getElementById("guilhermeRevenue").textContent = formatMoney(guilhermeRevenue);
+
+  updateSelectedDateLabel();
+}
 
     async function loadAppointments() {
       initSupabase();
@@ -869,21 +882,28 @@
           <td data-label="Horário"><strong>${escapeText(item.appointment_time || "-")}</strong></td>
           <td data-label="Barbeiro">${escapeText(barberName)}</td>
           <td data-label="Cliente">${escapeText(clientName)}</td>
-          <td data-label="WhatsApp">${escapeText(whatsapp)}</td>
-          <td data-label="Status">
-            <span class="status">${escapeText(statusLabel(status))}</span>
-          </td>
-          <td data-label="Ações">
-            <div class="actions">
-              <button type="button" class="btn-whatsapp" onclick="openWhatsapp('${escapeText(whatsapp)}', '${escapeText(clientName)}', '${escapeText(barberName)}')">
-                WhatsApp
-              </button>
+<td data-label="WhatsApp">${escapeText(whatsapp)}</td>
+<td data-label="Valor">
+  <strong>${item.service_value ? formatMoney(item.service_value) : "-"}</strong>
+</td>
+<td data-label="Status">
+  <span class="status">${escapeText(statusLabel(status))}</span>
+</td>
+<td data-label="Ações">
+  <div class="actions">
+    <button type="button" class="btn-primary" onclick="updateServiceValue('${escapeText(item.id)}')">
+      Valor
+    </button>
 
-              <button type="button" class="btn-danger" onclick="openCancelModal('${escapeText(item.id)}')">
-                Cancelar
-              </button>
-            </div>
-          </td>
+    <button type="button" class="btn-whatsapp" onclick="openWhatsapp('${escapeText(whatsapp)}', '${escapeText(clientName)}', '${escapeText(barberName)}')">
+      WhatsApp
+    </button>
+
+    <button type="button" class="btn-danger" onclick="openCancelModal('${escapeText(item.id)}')">
+      Cancelar
+    </button>
+  </div>
+</td>
         `;
 
         body.appendChild(tr);
@@ -960,6 +980,44 @@
       showToast("Agendamento cancelado e horário liberado.", "success");
       await loadAppointments();
     }
+
+    async function updateServiceValue(id) {
+  initSupabase();
+
+  if (!supabaseClient) return;
+
+  const item = lastLoadedData.find(row => String(row.id) === String(id));
+
+  const currentValue = item && item.service_value
+    ? String(item.service_value).replace(".", ",")
+    : "";
+
+  const value = prompt("Digite o valor do corte. Exemplo: 35 ou 35,50", currentValue);
+
+  if (value === null) return;
+
+  const cleanValue = value.replace(",", ".").trim();
+  const numberValue = Number(cleanValue);
+
+  if (isNaN(numberValue) || numberValue < 0) {
+    showToast("Valor inválido.", "error");
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("appointments")
+    .update({ service_value: numberValue })
+    .eq("id", id);
+
+  if (error) {
+    console.error("Erro ao salvar valor:", error);
+    showToast("Erro ao salvar valor: " + error.message, "error");
+    return;
+  }
+
+  showToast("Valor salvo com sucesso.", "success");
+  await loadAppointments();
+}
 
     function openWhatsapp(phone, name, barber) {
       if (!phone || phone === "-") {
