@@ -358,8 +358,9 @@ submitBtn.disabled=false;
 return;
 }
 
-show("Agendamento salvo!","success");
-window.scrollTo({top:0,behavior:"smooth"});
+alert("Agendamento confirmado com sucesso!");
+
+window.location.reload();
 };
 
 cancelBtn.onclick = () => {
