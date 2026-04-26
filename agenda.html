@@ -11,129 +11,273 @@
 body{
 min-height:100vh;
 font-family:Arial, Helvetica, sans-serif;
-background:linear-gradient(rgba(0,0,0,.78), rgba(0,0,0,.9)),
-url("hero.jpg") center/cover no-repeat;
+background:
+radial-gradient(circle at top, rgba(212,175,55,.16), transparent 34%),
+linear-gradient(rgba(0,0,0,.82), rgba(0,0,0,.94)),
+url("hero.jpg") center/cover no-repeat fixed;
 color:#fff;
-padding:24px;
+padding:20px;
 }
 
-.container{max-width:980px;margin:0 auto;}
+.container{
+max-width:980px;
+margin:0 auto;
+}
 
 .back-link{
-display:inline-block;
+display:inline-flex;
+align-items:center;
+gap:8px;
 margin-bottom:22px;
-color:#d4af37;
+color:#f5d28a;
 text-decoration:none;
-font-weight:bold;
+font-weight:800;
+font-size:14px;
 }
 
-header{text-align:center;margin-bottom:32px;}
+header{
+text-align:center;
+margin-bottom:26px;
+}
 
-header h1{font-size:36px;color:#d4af37;margin-bottom:8px;}
+.header-badge{
+display:inline-block;
+margin-bottom:12px;
+padding:8px 14px;
+border:1px solid rgba(212,175,55,.45);
+border-radius:999px;
+color:#f5d28a;
+font-size:11px;
+font-weight:800;
+letter-spacing:1.7px;
+text-transform:uppercase;
+background:rgba(0,0,0,.45);
+}
+
+header h1{
+font-size:clamp(30px, 7vw, 44px);
+color:#d4af37;
+margin-bottom:8px;
+text-transform:uppercase;
+letter-spacing:1px;
+}
+
+header p{
+color:#cfcfcf;
+font-size:15px;
+line-height:1.4;
+}
 
 .barber-selected{
-margin-top:12px;
-color:#d4af37;
-font-weight:bold;
+margin-top:14px;
+color:#fff;
+font-weight:800;
 font-size:18px;
 }
 
+.barber-selected span{
+color:#f5d28a;
+}
+
 .agenda-box{
-background:rgba(20,20,20,.94);
-border:1px solid rgba(212,175,55,.35);
-border-radius:18px;
-padding:28px;
+background:rgba(12,12,12,.94);
+border:1px solid rgba(212,175,55,.30);
+border-radius:24px;
+padding:22px;
+box-shadow:
+0 20px 44px rgba(0,0,0,.55),
+0 0 0 1px rgba(255,255,255,.04) inset;
+backdrop-filter:blur(8px);
+}
+
+.section{
+margin-bottom:30px;
 }
 
 .section-title{
-font-size:22px;
-color:#d4af37;
+font-size:21px;
+color:#f5d28a;
+margin-bottom:14px;
+text-transform:uppercase;
+letter-spacing:.6px;
+}
+
+.section-subtitle{
+color:#aaa;
+font-size:14px;
+margin-top:-6px;
 margin-bottom:16px;
+line-height:1.4;
 }
 
 .days{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
 gap:12px;
-margin-bottom:28px;
 }
 
-.day-btn,.time-btn{
-background:#111;
+.day-btn,
+.time-btn{
+background:linear-gradient(180deg, #171717, #0f0f0f);
 color:#fff;
-border:1px solid #444;
-padding:14px;
-border-radius:12px;
+border:1px solid rgba(255,255,255,.12);
+padding:15px 12px;
+border-radius:16px;
 cursor:pointer;
-font-weight:bold;
+font-weight:800;
+transition:.2s ease;
+box-shadow:0 10px 22px rgba(0,0,0,.25);
 }
 
 .day-btn span{
 display:block;
-font-size:13px;
-color:#bbb;
-margin-top:4px;
-}
-
-.day-btn.active,.time-btn.active{
-background:#d4af37;
-color:#000;
-border-color:#d4af37;
-}
-
-.time-btn.ocupado{
-background:#555;
+font-size:12px;
 color:#aaa;
-cursor:not-allowed;
-opacity:.6;
-text-decoration:line-through;
+margin-top:5px;
+font-weight:600;
+}
+
+.day-btn:hover,
+.time-btn:hover{
+transform:translateY(-2px);
+border-color:rgba(245,210,138,.55);
+}
+
+.day-btn.active,
+.time-btn.active{
+background:linear-gradient(135deg, #f5d28a, #d4af37, #a87318);
+color:#111;
+border-color:#f5d28a;
+box-shadow:0 14px 28px rgba(212,175,55,.18);
+}
+
+.day-btn.active span{
+color:#2c2107;
 }
 
 .times{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(105px,1fr));
 gap:12px;
-margin-bottom:28px;
+}
+
+.time-btn{
+min-height:54px;
+white-space:pre-line;
+}
+
+.time-btn.ocupado{
+background:#2d2d2d;
+color:#888;
+cursor:not-allowed;
+opacity:.75;
+text-decoration:line-through;
+box-shadow:none;
+}
+
+.time-btn.ocupado:hover{
+transform:none;
+border-color:rgba(255,255,255,.08);
 }
 
 .empty-times{
 color:#bbb;
-margin-bottom:28px;
-font-size:18px;
+font-size:16px;
+padding:18px;
+border:1px dashed rgba(255,255,255,.14);
+border-radius:16px;
+text-align:center;
+background:rgba(255,255,255,.03);
+}
+
+.selected-summary{
+display:none;
+margin-bottom:20px;
+padding:16px;
+border-radius:18px;
+background:rgba(212,175,55,.10);
+border:1px solid rgba(212,175,55,.28);
+color:#fff;
+line-height:1.5;
+}
+
+.selected-summary strong{
+color:#f5d28a;
+}
+
+.form-grid{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
 }
 
 input{
 width:100%;
-padding:14px;
-border-radius:10px;
-border:1px solid #444;
+padding:15px;
+border-radius:14px;
+border:1px solid rgba(255,255,255,.14);
 background:#111;
 color:#fff;
-margin-bottom:12px;
+font-size:15px;
+outline:none;
+}
+
+input:focus{
+border-color:rgba(245,210,138,.65);
+box-shadow:0 0 0 3px rgba(212,175,55,.10);
+}
+
+.actions{
+display:grid;
+grid-template-columns:1fr;
+gap:12px;
+margin-top:16px;
+}
+
+.submit-btn,
+.whatsapp-btn,
+.chemistry-btn{
+width:100%;
+padding:16px;
+border:none;
+border-radius:999px;
+font-weight:900;
+font-size:14px;
+letter-spacing:.5px;
+cursor:pointer;
+transition:.2s ease;
 }
 
 .submit-btn{
-width:100%;
-margin-top:10px;
-padding:15px;
-border:none;
-border-radius:12px;
-background:#d4af37;
-color:#000;
-font-weight:bold;
-cursor:pointer;
+background:linear-gradient(135deg, #f5d28a, #d4af37, #a87318);
+color:#111;
+box-shadow:0 14px 30px rgba(0,0,0,.40);
 }
 
 .whatsapp-btn{
-width:100%;
-margin-top:10px;
-padding:15px;
-border:none;
-border-radius:12px;
-background:#25D366;
+background:linear-gradient(135deg, #25D366, #128C7E);
 color:#fff;
-font-weight:bold;
-cursor:pointer;
+}
+
+.chemistry-btn{
+margin-top:18px;
+background:rgba(37,211,102,.12);
+color:#bfffd7;
+border:1px solid rgba(37,211,102,.45);
+line-height:1.35;
+}
+
+.submit-btn:hover,
+.whatsapp-btn:hover,
+.chemistry-btn:hover{
+transform:translateY(-2px);
+filter:brightness(1.06);
+}
+
+.submit-btn:active,
+.whatsapp-btn:active,
+.chemistry-btn:active{
+transform:scale(.98);
 }
 
 .msg{
@@ -141,15 +285,26 @@ margin-top:16px;
 text-align:center;
 font-weight:bold;
 display:none;
+padding:12px;
+border-radius:12px;
 }
 
-.msg.success{display:block;color:#4ade80;}
-.msg.error{display:block;color:#f87171;}
+.msg.success{
+display:block;
+color:#4ade80;
+background:rgba(74,222,128,.10);
+}
+
+.msg.error{
+display:block;
+color:#f87171;
+background:rgba(248,113,113,.10);
+}
 
 .popup-overlay{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,.75);
+background:rgba(0,0,0,.78);
 display:none;
 align-items:center;
 justify-content:center;
@@ -160,12 +315,27 @@ padding:20px;
 .popup-box{
 background:#111;
 border:1px solid rgba(212,175,55,.55);
-border-radius:18px;
-padding:28px;
-max-width:360px;
+border-radius:22px;
+padding:30px;
+max-width:380px;
 width:100%;
 text-align:center;
-box-shadow:0 0 30px rgba(0,0,0,.6);
+box-shadow:0 0 40px rgba(0,0,0,.75);
+}
+
+.popup-icon{
+width:58px;
+height:58px;
+margin:0 auto 14px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:rgba(212,175,55,.14);
+border:1px solid rgba(212,175,55,.45);
+color:#f5d28a;
+font-size:28px;
+font-weight:900;
 }
 
 .popup-box h3{
@@ -183,13 +353,46 @@ line-height:1.4;
 
 .popup-box button{
 width:100%;
-padding:14px;
+padding:15px;
 border:none;
-border-radius:12px;
-background:#d4af37;
+border-radius:999px;
+background:linear-gradient(135deg, #f5d28a, #d4af37, #a87318);
 color:#000;
-font-weight:bold;
+font-weight:900;
 cursor:pointer;
+}
+
+@media(min-width:760px){
+.agenda-box{
+padding:32px;
+}
+
+.form-grid{
+grid-template-columns:1fr 1fr 1fr;
+}
+
+.actions{
+grid-template-columns:1fr 1fr;
+}
+}
+
+@media(max-width:420px){
+body{
+padding:16px;
+}
+
+.agenda-box{
+padding:18px;
+border-radius:20px;
+}
+
+.days{
+grid-template-columns:1fr 1fr;
+}
+
+.times{
+grid-template-columns:1fr 1fr;
+}
 }
 </style>
 </head>
@@ -197,10 +400,12 @@ cursor:pointer;
 <body>
 <div class="container">
 
-<a href="barbeiros.html" class="back-link">← Voltar</a>
+<a href="barbeiros.html" class="back-link">← Voltar para barbeiros</a>
 
 <header>
-<h1>Agende seu Horário</h1>
+<div class="header-badge">Agendamento online</div>
+<h1>Agende seu horário</h1>
+<p>Escolha o dia, selecione um horário disponível e confirme seus dados.</p>
 <div id="barberSelected" class="barber-selected"></div>
 </header>
 
@@ -208,34 +413,53 @@ cursor:pointer;
 
 <div id="popupConfirmacao" class="popup-overlay">
   <div class="popup-box">
+    <div class="popup-icon">✓</div>
     <h3>Agendamento confirmado!</h3>
-    <p>Seu horário foi salvo com sucesso.</p>
+    <p>Seu horário foi salvo com sucesso. Ao clicar em OK, uma mensagem será aberta no WhatsApp para avisar a barbearia.</p>
     <button id="popupOkBtn">OK</button>
   </div>
 </div>
 
+<section class="section">
 <h2 class="section-title">Escolha o dia</h2>
+<p class="section-subtitle">Domingos não aparecem porque a barbearia não possui atendimento neste dia.</p>
 <div id="days" class="days"></div>
+</section>
 
-<h2 id="horariosTitulo" class="section-title">Horários</h2>
-<div id="timesMessage" class="empty-times">Selecione um dia</div>
+<section class="section">
+<h2 id="horariosTitulo" class="section-title">Horários disponíveis</h2>
+<div id="timesMessage" class="empty-times">Selecione um dia para visualizar os horários.</div>
 <div id="times" class="times"></div>
+</section>
+
+<section class="section">
+<div id="selectedSummary" class="selected-summary"></div>
 
 <h2 class="section-title">Seus dados</h2>
+<p class="section-subtitle">Preencha seus dados para confirmar o agendamento.</p>
 
 <form id="agendaForm">
+<div class="form-grid">
 <input id="nome" placeholder="Nome completo" required />
 <input id="apelido" placeholder="Apelido" required />
 <input id="whatsapp" placeholder="WhatsApp" required />
+</div>
 
-<button class="submit-btn" id="submitBtn">Confirmar</button>
+<div class="actions">
+<button class="submit-btn" id="submitBtn">Confirmar agendamento</button>
 
 <button type="button" id="cancelWhatsappBtn" class="whatsapp-btn">
 Desmarcar pelo WhatsApp
 </button>
+</div>
+
+<button type="button" id="chemistryWhatsappBtn" class="chemistry-btn">
+Para luzes, platinados ou químicas em geral, clique aqui e fale no WhatsApp
+</button>
 
 <p id="msg" class="msg"></p>
 </form>
+</section>
 
 </main>
 </div>
@@ -262,14 +486,16 @@ const horariosTitulo=document.getElementById("horariosTitulo");
 const agendaForm=document.getElementById("agendaForm");
 const submitBtn=document.getElementById("submitBtn");
 const cancelBtn=document.getElementById("cancelWhatsappBtn");
+const chemistryBtn=document.getElementById("chemistryWhatsappBtn");
 const popupConfirmacao=document.getElementById("popupConfirmacao");
 const popupOkBtn=document.getElementById("popupOkBtn");
+const selectedSummary=document.getElementById("selectedSummary");
 
 let selectedDate="";
 let selectedDay="";
 let selectedTime="";
 
-barberSelected.innerText=barbeiro || "";
+barberSelected.innerHTML=barbeiro ? `Barbeiro selecionado: <span>${barbeiro}</span>` : "";
 
 const diasSemana=[
 "Domingo",
@@ -317,6 +543,31 @@ block:"start"
 },200);
 }
 
+function rolarParaFormulario(){
+setTimeout(()=>{
+selectedSummary.scrollIntoView({
+behavior:"smooth",
+block:"center"
+});
+},150);
+}
+
+function atualizarResumo(){
+if(!selectedDate || !selectedDay || !selectedTime){
+selectedSummary.style.display="none";
+selectedSummary.innerHTML="";
+return;
+}
+
+selectedSummary.style.display="block";
+selectedSummary.innerHTML=`
+<strong>Resumo do agendamento:</strong><br>
+Barbeiro: ${barbeiro}<br>
+Dia: ${selectedDay}<br>
+Horário: ${selectedTime}
+`;
+}
+
 function gerarDias(){
 let diasCriados=0;
 let cont=0;
@@ -347,6 +598,7 @@ selectedDate=btn.dataset.date;
 selectedDay=btn.dataset.day;
 selectedTime="";
 
+atualizarResumo();
 await gerarHorarios();
 rolarParaHorarios();
 };
@@ -399,6 +651,8 @@ current.setHours(start,0,0,0);
 let limit=new Date();
 limit.setHours(end,0,0,0);
 
+let horariosDisponiveis=0;
+
 while(current<limit){
 let h=String(current.getHours()).padStart(2,"0");
 let m=String(current.getMinutes()).padStart(2,"0");
@@ -413,15 +667,24 @@ btn.innerText=ocupado?`${time}\nIndisponível`:time;
 btn.disabled=ocupado;
 
 if(!ocupado){
+horariosDisponiveis++;
+
 btn.onclick=()=>{
 document.querySelectorAll(".time-btn").forEach(b=>b.classList.remove("active"));
 btn.classList.add("active");
 selectedTime=time;
+atualizarResumo();
+rolarParaFormulario();
 };
 }
 
 timesContainer.appendChild(btn);
 current.setMinutes(current.getMinutes()+40);
+}
+
+if(horariosDisponiveis===0){
+timesMessage.style.display="block";
+timesMessage.innerText="Não há horários disponíveis para este dia.";
 }
 }
 
@@ -455,7 +718,7 @@ const disponivel=await horarioAindaDisponivel();
 if(!disponivel){
 show("Este horário acabou de ser preenchido. Escolha outro horário.","error");
 submitBtn.disabled=false;
-submitBtn.innerText="Confirmar";
+submitBtn.innerText="Confirmar agendamento";
 await gerarHorarios();
 return;
 }
@@ -476,7 +739,7 @@ if(error){
 console.error("Erro ao salvar agendamento:",error);
 show("Erro ao salvar. Tente novamente.","error");
 submitBtn.disabled=false;
-submitBtn.innerText="Confirmar";
+submitBtn.innerText="Confirmar agendamento";
 return;
 }
 
@@ -502,6 +765,13 @@ const mensagem=`Olá! Quero desmarcar meu horário.
 Nome: ${nome}
 WhatsApp: ${whatsapp}
 Barbeiro: ${barbeiro}`;
+
+const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
+window.open(url,"_blank");
+};
+
+chemistryBtn.onclick=()=>{
+const mensagem=`Olá! Gostaria de consultar valores para luzes, platinado ou químicas em geral.`;
 
 const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
 window.open(url,"_blank");
