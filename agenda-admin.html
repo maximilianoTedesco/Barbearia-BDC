@@ -1,619 +1,658 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agendamento ADM | Barbearia BDC</title>
 
-  <title>Agendamento ADM | Barbearia BDC</title>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+:root{
+  --gold:#d4af37;
+  --gold-light:#f1cf5a;
+  --bg:#050505;
+  --card:#111;
+  --border:#292929;
+  --muted:#aaa;
+  --danger:#b91c1c;
+}
 
-    :root {
-      --gold: #d4af37;
-      --gold-light: #f1cf5a;
-      --bg: #050505;
-      --card: #111;
-      --border: #292929;
-      --muted: #aaa;
-      --danger: #b91c1c;
-      --success: #16a34a;
-    }
+body{
+  font-family:Arial, Helvetica, sans-serif;
+  background:radial-gradient(circle at top, rgba(212,175,55,.10), transparent 38%), var(--bg);
+  color:#fff;
+  min-height:100vh;
+  padding:20px;
+}
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(circle at top, rgba(212,175,55,0.10), transparent 38%), var(--bg);
-      color: #fff;
-      min-height: 100vh;
-      padding: 20px;
-    }
+.container{max-width:980px;margin:0 auto;}
 
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-    }
+header{
+  margin-bottom:24px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--border);
+}
 
-    header {
-      margin-bottom: 24px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--border);
-    }
+h1{color:var(--gold);font-size:30px;margin-bottom:6px;}
+h2{font-size:20px;margin-bottom:16px;}
 
-    h1 {
-      color: var(--gold);
-      font-size: 30px;
-      margin-bottom: 6px;
-    }
+.subtitle{color:var(--muted);font-size:15px;}
 
-    h2 {
-      font-size: 20px;
-      margin-bottom: 16px;
-    }
+.card{
+  background:linear-gradient(180deg, var(--card), #0b0b0b);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:22px;
+  box-shadow:0 12px 35px rgba(0,0,0,.30);
+}
 
-    .subtitle {
-      color: var(--muted);
-      font-size: 15px;
-    }
+label{
+  display:block;
+  margin-bottom:7px;
+  font-weight:bold;
+  color:#ddd;
+  font-size:14px;
+}
 
-    .card {
-      background: linear-gradient(180deg, var(--card), #0b0b0b);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      margin-bottom: 22px;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.30);
-    }
+input,select,textarea{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #333;
+  background:#050505;
+  color:#fff;
+  font-size:15px;
+  outline:none;
+}
 
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: bold;
-      color: #ddd;
-      font-size: 14px;
-    }
+input:focus,select:focus,textarea:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(212,175,55,.15);
+}
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #333;
-      background: #050505;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-    }
+textarea{min-height:90px;resize:vertical;}
 
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px rgba(212,175,55,0.15);
-    }
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
 
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
+.full{grid-column:1 / -1;}
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
+button{
+  border:none;
+  border-radius:12px;
+  padding:14px 18px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+  font-size:15px;
+}
 
-    .full {
-      grid-column: 1 / -1;
-    }
+button:hover{transform:translateY(-1px);}
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-weight: 900;
-      cursor: pointer;
-      transition: 0.2s;
-      font-size: 15px;
-    }
+.btn-primary{background:var(--gold);color:#000;}
+.btn-primary:hover{background:var(--gold-light);}
+.btn-secondary{background:#222;color:#fff;}
+.btn-danger{background:var(--danger);color:#fff;}
 
-    button:hover {
-      transform: translateY(-1px);
-    }
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
 
-    .btn-primary {
-      background: var(--gold);
-      color: #000;
-    }
+.actions button{min-width:180px;}
 
-    .btn-primary:hover {
-      background: var(--gold-light);
-    }
+.hours-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:12px;
+  margin-top:12px;
+}
 
-    .btn-secondary {
-      background: #222;
-      color: #fff;
-    }
+.hour-btn{
+  background:#171717;
+  color:#fff;
+  border:1px solid #333;
+  padding:13px 10px;
+  border-radius:12px;
+  white-space:pre-line;
+}
 
-    .btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
+.hour-btn:hover{border-color:var(--gold);}
 
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
+.hour-btn.selected{
+  background:var(--gold);
+  color:#000;
+  border-color:var(--gold);
+}
 
-    .actions button {
-      min-width: 180px;
-    }
+.hour-btn.busy{
+  background:#555;
+  color:#aaa;
+  border-color:#555;
+  cursor:not-allowed;
+  opacity:.65;
+  text-decoration:line-through;
+}
 
-    .hours-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
+.message{
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:18px;
+  display:none;
+  font-weight:bold;
+}
 
-    .hour-btn {
-      background: #171717;
-      color: #fff;
-      border: 1px solid #333;
-      padding: 13px 10px;
-      border-radius: 12px;
-    }
+.message.success{
+  background:rgba(22,163,74,.18);
+  border:1px solid rgba(22,163,74,.45);
+  color:#86efac;
+  display:block;
+}
 
-    .hour-btn:hover {
-      border-color: var(--gold);
-    }
+.message.error{
+  background:rgba(185,28,28,.18);
+  border:1px solid rgba(185,28,28,.45);
+  color:#fca5a5;
+  display:block;
+}
 
-    .hour-btn.selected {
-      background: var(--gold);
-      color: #000;
-      border-color: var(--gold);
-    }
+.tip{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:10px;
+  line-height:1.5;
+}
 
-    .hour-btn.busy {
-      background: #3a1111;
-      color: #777;
-      border-color: #5a1a1a;
-      cursor: not-allowed;
-      text-decoration: line-through;
-    }
+.selected-info{
+  background:#080808;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  margin-top:16px;
+  color:#ddd;
+  line-height:1.7;
+}
 
-    .message {
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 18px;
-      display: none;
-      font-weight: bold;
-    }
+.selected-info strong{color:var(--gold);}
 
-    .message.success {
-      background: rgba(22, 163, 74, 0.18);
-      border: 1px solid rgba(22, 163, 74, 0.45);
-      color: #86efac;
-      display: block;
-    }
+.popup-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  padding:20px;
+}
 
-    .message.error {
-      background: rgba(185, 28, 28, 0.18);
-      border: 1px solid rgba(185, 28, 28, 0.45);
-      color: #fca5a5;
-      display: block;
-    }
+.popup-box{
+  background:#111;
+  border:1px solid rgba(212,175,55,.55);
+  border-radius:18px;
+  padding:28px;
+  max-width:380px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 0 30px rgba(0,0,0,.6);
+}
 
-    .tip {
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 10px;
-      line-height: 1.5;
-    }
+.popup-box h3{
+  color:var(--gold);
+  font-size:24px;
+  margin-bottom:12px;
+}
 
-    .selected-info {
-      background: #080808;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-top: 16px;
-      color: #ddd;
-      line-height: 1.7;
-    }
+.popup-box p{
+  color:#fff;
+  font-size:16px;
+  margin-bottom:22px;
+  line-height:1.4;
+}
 
-    .selected-info strong {
-      color: var(--gold);
-    }
+.popup-box button{
+  width:100%;
+  background:var(--gold);
+  color:#000;
+}
 
-    @media (max-width: 720px) {
-      body {
-        padding: 14px;
-      }
-
-      h1 {
-        font-size: 25px;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .actions button {
-        width: 100%;
-      }
-
-      .hours-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-  </style>
+@media(max-width:720px){
+  body{padding:14px;}
+  h1{font-size:25px;}
+  .form-grid{grid-template-columns:1fr;}
+  .actions button{width:100%;}
+  .hours-grid{grid-template-columns:repeat(3,1fr);}
+}
+</style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <h1>Agendamento pelo Painel ADM</h1>
-      <p class="subtitle">
-        Tela exclusiva para o administrador criar agendamentos diretamente no banco.
-      </p>
-    </header>
+<div class="container">
 
-    <div id="messageBox" class="message"></div>
+<header>
+  <h1>Agendamento pelo Painel ADM</h1>
+  <p class="subtitle">Tela exclusiva para o administrador criar agendamentos diretamente no banco.</p>
+</header>
 
-    <section class="card">
-      <h2>Dados do agendamento</h2>
+<div id="popupConfirmacao" class="popup-overlay">
+  <div class="popup-box">
+    <h3>Agendamento confirmado!</h3>
+    <p>O horário foi salvo com sucesso pelo painel do ADM.</p>
+    <button id="popupOkBtn">OK</button>
+  </div>
+</div>
 
-      <div class="form-grid">
-        <div>
-          <label for="appointmentDate">Data</label>
-          <input type="date" id="appointmentDate" />
-        </div>
+<div id="messageBox" class="message"></div>
 
-        <div>
-          <label for="barberSelect">Barbeiro</label>
-          <select id="barberSelect">
-            <option value="">Selecione o barbeiro</option>
-            <option value="1f39cf56-9a40-42ee-a968-56f1537b47c3">Brunin</option>
-            <option value="766b291c-4b4f-47ad-89e5-7893b1af0d28">Guilherme</option>
-          </select>
-        </div>
+<section class="card">
+  <h2>Dados do agendamento</h2>
 
-        <div>
-          <label for="clientName">Nome do cliente</label>
-          <input type="text" id="clientName" placeholder="Ex: João Silva" />
-        </div>
+  <div class="form-grid">
+    <div>
+      <label for="appointmentDate">Data</label>
+      <input type="date" id="appointmentDate" />
+    </div>
 
-        <div>
-          <label for="clientWhatsapp">WhatsApp</label>
-          <input type="tel" id="clientWhatsapp" placeholder="Ex: 51999999999" />
-        </div>
+    <div>
+      <label for="barberSelect">Barbeiro</label>
+      <select id="barberSelect">
+        <option value="">Selecione o barbeiro</option>
+        <option value="1f39cf56-9a40-42ee-a968-56f1537b47c3">Brunin</option>
+        <option value="766b291c-4b4f-47ad-89e5-7893b1af0d28">Guilherme</option>
+      </select>
+    </div>
 
-        <div class="full">
-          <label for="observation">Observação interna</label>
-          <textarea id="observation" placeholder="Opcional — não será salvo no banco por enquanto"></textarea>
-        </div>
-      </div>
+    <div>
+      <label for="clientName">Nome do cliente</label>
+      <input type="text" id="clientName" placeholder="Ex: João Silva" />
+    </div>
 
-      <p class="tip">
-        Dica: informe o WhatsApp apenas com números. Exemplo: 51999999999.
-      </p>
-    </section>
+    <div>
+      <label for="clientWhatsapp">WhatsApp</label>
+      <input type="tel" id="clientWhatsapp" placeholder="Ex: 51999999999" />
+    </div>
 
-    <section class="card">
-      <h2>Escolha o horário</h2>
-
-      <p class="tip">
-        Os horários ocupados aparecem bloqueados automaticamente.
-      </p>
-
-      <div id="hoursGrid" class="hours-grid"></div>
-
-      <div id="selectedInfo" class="selected-info">
-        Nenhum horário selecionado.
-      </div>
-
-      <div class="actions">
-        <button type="button" class="btn-primary" onclick="createAppointment()">
-          Confirmar agendamento
-        </button>
-
-        <button type="button" class="btn-secondary" onclick="loadBusyHours()">
-          Atualizar horários
-        </button>
-
-        <button type="button" class="btn-danger" onclick="window.close()">
-          Fechar
-        </button>
-      </div>
-    </section>
+    <div class="full">
+      <label for="observation">Observação interna</label>
+      <textarea id="observation" placeholder="Opcional — não será salvo no banco por enquanto"></textarea>
+    </div>
   </div>
 
-  <script>
-    const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
+  <p class="tip">Dica: informe o WhatsApp apenas com números. Exemplo: 51999999999.</p>
+</section>
 
-    const BARBERS = {
-      "1f39cf56-9a40-42ee-a968-56f1537b47c3": "Brunin",
-      "766b291c-4b4f-47ad-89e5-7893b1af0d28": "Guilherme"
-    };
+<section class="card">
+  <h2>Escolha o horário</h2>
 
-    const AVAILABLE_HOURS = [
-      "09:00", "09:30", "10:00", "10:30",
-      "11:00", "11:30", "12:00", "12:30",
-      "13:00", "13:30", "14:00", "14:30",
-      "15:00", "15:30", "16:00", "16:30",
-      "17:00", "17:30", "18:00", "18:30",
-      "19:00", "19:30"
-    ];
+  <p class="tip">
+    Os horários ocupados são consultados diretamente no Supabase e bloqueados automaticamente.
+  </p>
 
-    let supabaseClient = null;
-    let selectedHour = "";
-    let busyHours = [];
+  <div id="hoursGrid" class="hours-grid"></div>
 
-    function initSupabase() {
-      if (supabaseClient) return;
+  <div id="selectedInfo" class="selected-info">
+    Selecione uma data e um barbeiro para carregar os horários.
+  </div>
 
-      if (!window.supabase) {
-        showMessage("Erro ao carregar Supabase. Atualize a página.", "error");
-        return;
-      }
+  <div class="actions">
+    <button type="button" id="confirmBtn" class="btn-primary" onclick="createAppointment()">
+      Confirmar agendamento
+    </button>
 
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
+    <button type="button" class="btn-secondary" onclick="gerarHorarios()">
+      Atualizar horários
+    </button>
 
-    function showMessage(text, type) {
-      const box = document.getElementById("messageBox");
-      box.textContent = text;
-      box.className = "message " + type;
+    <button type="button" class="btn-danger" onclick="window.close()">
+      Fechar
+    </button>
+  </div>
+</section>
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    }
+</div>
 
-    function clearMessage() {
-      const box = document.getElementById("messageBox");
-      box.textContent = "";
-      box.className = "message";
-    }
+<script>
+const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
 
-    function setToday() {
-      const input = document.getElementById("appointmentDate");
+let supabaseClient = null;
 
-      if (!input.value) {
-        input.value = new Date().toISOString().split("T")[0];
-      }
-    }
+const BARBERS = {
+  "1f39cf56-9a40-42ee-a968-56f1537b47c3": "Brunin",
+  "766b291c-4b4f-47ad-89e5-7893b1af0d28": "Guilherme"
+};
 
-    function getBarberName() {
-      const barberId = document.getElementById("barberSelect").value;
-      return BARBERS[barberId] || "";
-    }
+const diasSemana = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado"
+];
 
-    function getWeekdayName(dateValue) {
-      const [year, month, day] = dateValue.split("-");
-      const date = new Date(Number(year), Number(month) - 1, Number(day));
+let selectedDate = "";
+let selectedDay = "";
+let selectedTime = "";
 
-      const weekdays = [
-        "Domingo",
-        "Segunda-feira",
-        "Terça-feira",
-        "Quarta-feira",
-        "Quinta-feira",
-        "Sexta-feira",
-        "Sábado"
-      ];
+const appointmentDate = document.getElementById("appointmentDate");
+const barberSelect = document.getElementById("barberSelect");
+const hoursGrid = document.getElementById("hoursGrid");
+const selectedInfo = document.getElementById("selectedInfo");
+const confirmBtn = document.getElementById("confirmBtn");
+const popupConfirmacao = document.getElementById("popupConfirmacao");
+const popupOkBtn = document.getElementById("popupOkBtn");
 
-      return weekdays[date.getDay()];
-    }
+function initSupabase(){
+  if(supabaseClient) return;
 
-    function updateSelectedInfo() {
-      const date = document.getElementById("appointmentDate").value;
-      const barber = getBarberName();
+  if(!window.supabase){
+    showMessage("Erro ao carregar Supabase. Atualize a página.", "error");
+    return;
+  }
 
-      const info = document.getElementById("selectedInfo");
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
 
-      if (!date || !barber || !selectedHour) {
-        info.innerHTML = "Nenhum horário selecionado.";
-        return;
-      }
+function formatISO(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
 
-      const [year, month, day] = date.split("-");
-      const weekday = getWeekdayName(date);
+function normalizarHorario(time){
+  if(!time) return "";
+  return String(time).slice(0,5);
+}
 
-      info.innerHTML = `
-        <strong>Resumo:</strong><br>
-        Data: ${day}/${month}/${year} - ${weekday}<br>
-        Horário: ${selectedHour}<br>
-        Barbeiro: ${barber}
-      `;
-    }
+function getWeekdayName(dateValue){
+  const [year, month, day] = dateValue.split("-");
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  return diasSemana[date.getDay()];
+}
 
-    function renderHours() {
-      const grid = document.getElementById("hoursGrid");
-      grid.innerHTML = "";
+function getBarberName(){
+  return BARBERS[barberSelect.value] || "";
+}
 
-      AVAILABLE_HOURS.forEach((hour) => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.textContent = hour;
-        button.className = "hour-btn";
+function statusOcupaHorario(status){
+  if(!status) return true;
 
-        const isBusy = busyHours.includes(hour);
+  const s = String(status).toLowerCase().trim();
 
-        if (isBusy) {
-          button.classList.add("busy");
-          button.disabled = true;
-        }
+  if(s === "cancelled") return false;
+  if(s === "canceled") return false;
+  if(s === "cancelado") return false;
+  if(s === "excluido") return false;
+  if(s === "deleted") return false;
 
-        if (selectedHour === hour) {
-          button.classList.add("selected");
-        }
+  return true;
+}
 
-        button.addEventListener("click", () => {
-          if (button.disabled) return;
+function showMessage(text, type){
+  const box = document.getElementById("messageBox");
+  box.textContent = text;
+  box.className = "message " + type;
 
-          selectedHour = hour;
-          renderHours();
-          updateSelectedInfo();
-        });
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
 
-        grid.appendChild(button);
-      });
-    }
+function clearMessage(){
+  const box = document.getElementById("messageBox");
+  box.textContent = "";
+  box.className = "message";
+}
 
-    async function loadBusyHours() {
-      clearMessage();
-      initSupabase();
+function onlyNumbers(value){
+  return String(value || "").replace(/\D/g, "");
+}
 
-      if (!supabaseClient) return;
+function setToday(){
+  if(!appointmentDate.value){
+    appointmentDate.value = formatISO(new Date());
+  }
+}
 
-      const date = document.getElementById("appointmentDate").value;
-      const barberId = document.getElementById("barberSelect").value;
+function updateSelectedInfo(){
+  const barberName = getBarberName();
 
-      selectedHour = "";
-      busyHours = [];
+  if(!selectedDate || !selectedDay || !barberName || !selectedTime){
+    selectedInfo.innerHTML = "Nenhum horário selecionado.";
+    return;
+  }
 
-      if (!date || !barberId) {
-        renderHours();
+  const [year, month, day] = selectedDate.split("-");
+
+  selectedInfo.innerHTML = `
+    <strong>Resumo:</strong><br>
+    Data: ${day}/${month}/${year} - ${selectedDay}<br>
+    Horário: ${selectedTime}<br>
+    Barbeiro: ${barberName}
+  `;
+}
+
+async function buscarOcupados(){
+  initSupabase();
+
+  if(!supabaseClient || !selectedDate || !barberSelect.value){
+    return [];
+  }
+
+  const { data, error } = await supabaseClient
+    .from("appointments")
+    .select("appointment_time,status")
+    .eq("barber_id", barberSelect.value)
+    .eq("appointment_date", selectedDate);
+
+  if(error){
+    console.error("Erro ao buscar horários ocupados:", error);
+    showMessage("Erro ao buscar horários ocupados: " + error.message, "error");
+    return [];
+  }
+
+  return (data || [])
+    .filter(item => statusOcupaHorario(item.status))
+    .map(item => normalizarHorario(item.appointment_time));
+}
+
+async function gerarHorarios(){
+  clearMessage();
+
+  selectedDate = appointmentDate.value;
+  selectedTime = "";
+
+  if(!selectedDate){
+    hoursGrid.innerHTML = "";
+    selectedInfo.innerHTML = "Selecione uma data.";
+    return;
+  }
+
+  if(!barberSelect.value){
+    hoursGrid.innerHTML = "";
+    selectedInfo.innerHTML = "Selecione um barbeiro para carregar os horários.";
+    return;
+  }
+
+  selectedDay = getWeekdayName(selectedDate);
+
+  if(selectedDay === "Domingo"){
+    hoursGrid.innerHTML = "";
+    selectedInfo.innerHTML = "Domingo não possui horários disponíveis.";
+    return;
+  }
+
+  hoursGrid.innerHTML = "";
+
+  let start = 9;
+  let end = 19;
+
+  if(selectedDay === "Segunda-feira"){
+    start = 14;
+    end = 20;
+  }
+
+  const ocupados = await buscarOcupados();
+
+  const agora = new Date();
+  const hoje = formatISO(agora);
+
+  const current = new Date();
+  current.setHours(start, 0, 0, 0);
+
+  const limit = new Date();
+  limit.setHours(end, 0, 0, 0);
+
+  while(current < limit){
+    const h = String(current.getHours()).padStart(2, "0");
+    const m = String(current.getMinutes()).padStart(2, "0");
+    const time = `${h}:${m}`;
+
+    const passado = selectedDate === hoje && current < agora;
+    const ocupado = ocupados.includes(time) || passado;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = ocupado ? "hour-btn busy" : "hour-btn";
+    btn.innerText = ocupado ? `${time}\nIndisponível` : time;
+    btn.disabled = ocupado;
+
+    if(!ocupado){
+      btn.onclick = () => {
+        document.querySelectorAll(".hour-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedTime = time;
         updateSelectedInfo();
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from("appointments")
-        .select("appointment_time")
-        .eq("appointment_date", date)
-        .eq("barber_id", barberId);
-
-      if (error) {
-        console.error(error);
-        showMessage("Erro ao buscar horários ocupados: " + error.message, "error");
-        renderHours();
-        return;
-      }
-
-      busyHours = (data || [])
-        .map((item) => item.appointment_time)
-        .filter(Boolean);
-
-      renderHours();
-      updateSelectedInfo();
-    }
-
-    function onlyNumbers(value) {
-      return String(value || "").replace(/\D/g, "");
-    }
-
-    async function createAppointment() {
-      clearMessage();
-      initSupabase();
-
-      if (!supabaseClient) return;
-
-      const appointmentDate = document.getElementById("appointmentDate").value;
-      const barberId = document.getElementById("barberSelect").value;
-      const barberName = getBarberName();
-      const clientName = document.getElementById("clientName").value.trim();
-      const clientWhatsapp = onlyNumbers(document.getElementById("clientWhatsapp").value);
-
-      if (!appointmentDate) {
-        showMessage("Selecione a data do agendamento.", "error");
-        return;
-      }
-
-      if (!barberId) {
-        showMessage("Selecione o barbeiro.", "error");
-        return;
-      }
-
-      if (!selectedHour) {
-        showMessage("Selecione um horário disponível.", "error");
-        return;
-      }
-
-      if (!clientName) {
-        showMessage("Informe o nome do cliente.", "error");
-        return;
-      }
-
-      if (!clientWhatsapp) {
-        showMessage("Informe o WhatsApp do cliente.", "error");
-        return;
-      }
-
-      const { data: existing, error: checkError } = await supabaseClient
-        .from("appointments")
-        .select("id")
-        .eq("appointment_date", appointmentDate)
-        .eq("appointment_time", selectedHour)
-        .eq("barber_id", barberId)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error(checkError);
-        showMessage("Erro ao verificar disponibilidade: " + checkError.message, "error");
-        return;
-      }
-
-      if (existing) {
-        showMessage("Este horário já está ocupado. Atualize os horários e escolha outro.", "error");
-        await loadBusyHours();
-        return;
-      }
-
-      const weekday = getWeekdayName(appointmentDate);
-
-      const newAppointment = {
-        appointment_date: appointmentDate,
-        appointment_time: selectedHour,
-        weekday: weekday,
-        barber_id: barberId,
-        barber_name: barberName,
-        customer_name: clientName,
-        customer_whatsapp: clientWhatsapp,
-        status: "scheduled"
       };
-
-      const { error } = await supabaseClient
-        .from("appointments")
-        .insert([newAppointment]);
-
-      if (error) {
-        console.error(error);
-        showMessage("Erro ao criar agendamento: " + error.message, "error");
-        return;
-      }
-
-      showMessage("Agendamento criado com sucesso pelo painel do ADM.", "success");
-
-      document.getElementById("clientName").value = "";
-      document.getElementById("clientWhatsapp").value = "";
-      document.getElementById("observation").value = "";
-      selectedHour = "";
-
-      await loadBusyHours();
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      setToday();
-      initSupabase();
-      renderHours();
+    hoursGrid.appendChild(btn);
+    current.setMinutes(current.getMinutes() + 40);
+  }
 
-      document.getElementById("appointmentDate").addEventListener("change", loadBusyHours);
-      document.getElementById("barberSelect").addEventListener("change", loadBusyHours);
+  selectedInfo.innerHTML = "Selecione um horário disponível.";
+}
 
-      setTimeout(loadBusyHours, 300);
-    });
-  </script>
+async function horarioAindaDisponivel(){
+  const ocupados = await buscarOcupados();
+  return !ocupados.includes(selectedTime);
+}
+
+async function createAppointment(){
+  clearMessage();
+  initSupabase();
+
+  if(!supabaseClient) return;
+
+  selectedDate = appointmentDate.value;
+  selectedDay = selectedDate ? getWeekdayName(selectedDate) : "";
+
+  const barberId = barberSelect.value;
+  const barberName = getBarberName();
+  const clientName = document.getElementById("clientName").value.trim();
+  const clientWhatsapp = onlyNumbers(document.getElementById("clientWhatsapp").value);
+
+  if(!selectedDate){
+    showMessage("Selecione a data do agendamento.", "error");
+    return;
+  }
+
+  if(selectedDay === "Domingo"){
+    showMessage("Domingo não possui horários disponíveis.", "error");
+    return;
+  }
+
+  if(!barberId){
+    showMessage("Selecione o barbeiro.", "error");
+    return;
+  }
+
+  if(!selectedTime){
+    showMessage("Selecione um horário disponível.", "error");
+    return;
+  }
+
+  if(!clientName){
+    showMessage("Informe o nome do cliente.", "error");
+    return;
+  }
+
+  if(!clientWhatsapp){
+    showMessage("Informe o WhatsApp do cliente.", "error");
+    return;
+  }
+
+  confirmBtn.disabled = true;
+  confirmBtn.innerText = "Salvando...";
+
+  const disponivel = await horarioAindaDisponivel();
+
+  if(!disponivel){
+    showMessage("Este horário acabou de ser preenchido. Escolha outro horário.", "error");
+    confirmBtn.disabled = false;
+    confirmBtn.innerText = "Confirmar agendamento";
+    await gerarHorarios();
+    return;
+  }
+
+  const { error } = await supabaseClient.from("appointments").insert([{
+    barber_id: barberId,
+    barber_name: barberName,
+    customer_name: clientName,
+    customer_nickname: "Agendado pelo ADM",
+    customer_whatsapp: clientWhatsapp,
+    weekday: selectedDay,
+    appointment_date: selectedDate,
+    appointment_time: selectedTime,
+    status: "novo"
+  }]);
+
+  if(error){
+    console.error("Erro ao salvar agendamento:", error);
+    showMessage("Erro ao criar agendamento: " + error.message, "error");
+    confirmBtn.disabled = false;
+    confirmBtn.innerText = "Confirmar agendamento";
+    return;
+  }
+
+  popupConfirmacao.style.display = "flex";
+}
+
+popupOkBtn.onclick = async () => {
+  popupConfirmacao.style.display = "none";
+
+  document.getElementById("clientName").value = "";
+  document.getElementById("clientWhatsapp").value = "";
+  document.getElementById("observation").value = "";
+
+  selectedTime = "";
+
+  confirmBtn.disabled = false;
+  confirmBtn.innerText = "Confirmar agendamento";
+
+  await gerarHorarios();
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  setToday();
+  initSupabase();
+
+  appointmentDate.addEventListener("change", gerarHorarios);
+  barberSelect.addEventListener("change", gerarHorarios);
+
+  setTimeout(gerarHorarios, 300);
+});
+</script>
+
 </body>
 </html>
