@@ -35,7 +35,7 @@ font-weight:800;
 font-size:14px;
 }
 
-  .trust-text{
+.trust-text{
 text-align:center;
 font-size:13px;
 color:#aaa;
@@ -317,6 +317,7 @@ align-items:center;
 justify-content:center;
 z-index:9999;
 padding:20px;
+outline:none;
 }
 
 .popup-box{
@@ -328,6 +329,18 @@ max-width:380px;
 width:100%;
 text-align:center;
 box-shadow:0 0 40px rgba(0,0,0,.75);
+animation:popupOpen .22s ease forwards;
+}
+
+@keyframes popupOpen{
+from{
+opacity:0;
+transform:scale(.94);
+}
+to{
+opacity:1;
+transform:scale(1);
+}
 }
 
 .popup-icon{
@@ -466,6 +479,7 @@ grid-template-columns:1fr 1fr;
 Desmarcar pelo WhatsApp
 </button>
 </div>
+
 <p class="trust-text">
 Sem compromisso • Leva menos de 1 minuto
 </p>
@@ -507,6 +521,7 @@ const chemistryBtn=document.getElementById("chemistryWhatsappBtn");
 const popupConfirmacao=document.getElementById("popupConfirmacao");
 const popupOkBtn=document.getElementById("popupOkBtn");
 const selectedSummary=document.getElementById("selectedSummary");
+const whatsappInput=document.getElementById("whatsapp");
 
 let selectedDate="";
 let selectedDay="";
@@ -523,6 +538,10 @@ const diasSemana=[
 "Sexta-feira",
 "Sábado"
 ];
+
+whatsappInput.addEventListener("input", function(){
+this.value=this.value.replace(/\D/g,"").slice(0,15);
+});
 
 function formatISO(d){
 return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
@@ -567,6 +586,20 @@ behavior:"smooth",
 block:"center"
 });
 },150);
+}
+
+function abrirPopupConfirmacao(){
+popupConfirmacao.style.display="flex";
+document.body.style.overflow="hidden";
+
+setTimeout(()=>{
+popupOkBtn.focus();
+},100);
+}
+
+function fecharPopupConfirmacao(){
+popupConfirmacao.style.display="none";
+document.body.style.overflow="auto";
 }
 
 function atualizarResumo(){
@@ -769,15 +802,7 @@ submitBtn.innerText="Confirmar horário";
 return;
 }
 
-window.scrollTo(0, 0); // sobe instantaneamente
-
-popupConfirmacao.style.display="flex";
-
-// foca no popup
-popupConfirmacao.focus();
-
-// impede scroll da página
-document.body.style.overflow = "hidden";
+abrirPopupConfirmacao();
 };
 
 cancelBtn.onclick=()=>{
@@ -812,6 +837,8 @@ window.open(url,"_blank");
 };
 
 popupOkBtn.onclick=()=>{
+fecharPopupConfirmacao();
+
 const nome=document.getElementById("nome").value.trim();
 
 const mensagem=`Acabei de agendar um horário com o barbeiro ${barbeiro}.
