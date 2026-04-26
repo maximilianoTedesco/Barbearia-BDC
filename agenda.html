@@ -769,7 +769,14 @@ submitBtn.innerText="Confirmar horário";
 return;
 }
 
+window.scrollTo({
+top: 0,
+behavior: "smooth"
+});
+
+setTimeout(()=>{
 popupConfirmacao.style.display="flex";
+},300);
 };
 
 cancelBtn.onclick=()=>{
