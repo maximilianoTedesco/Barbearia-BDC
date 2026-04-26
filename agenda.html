@@ -41,6 +41,14 @@ font-size:13px;
 color:#aaa;
 margin-top:8px;
 }
+
+.chemistry-text{
+text-align:center;
+font-size:14px;
+color:#bbb;
+margin-top:16px;
+margin-bottom:8px;
+}
   
 header{
 text-align:center;
@@ -485,6 +493,10 @@ Desmarcar pelo WhatsApp
 Sem compromisso • Leva menos de 1 minuto
 </p>
   
+<p class="chemistry-text">
+Quer fazer algo mais elaborado?
+</p>
+
 <button type="button" id="chemistryWhatsappBtn" class="chemistry-btn">
 Para luzes, platinado ou químicas, fale direto no WhatsApp
 </button>
@@ -541,7 +553,17 @@ const diasSemana=[
 ];
 
 whatsappInput.addEventListener("input", function(){
-this.value=this.value.replace(/\D/g,"").slice(0,15);
+let v=this.value.replace(/\D/g,"").slice(0,11);
+
+if(v.length>10){
+this.value=`(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+}else if(v.length>6){
+this.value=`(${v.slice(0,2)}) ${v.slice(2,6)}-${v.slice(6)}`;
+}else if(v.length>2){
+this.value=`(${v.slice(0,2)}) ${v.slice(2)}`;
+}else{
+this.value=v;
+}
 });
 
 function formatISO(d){
@@ -684,6 +706,8 @@ return (data || [])
 async function gerarHorarios(){
 timesContainer.innerHTML="";
 timesMessage.style.display="none";
+timesMessage.style.display="block";
+timesMessage.innerText="Carregando horários...";
 
 let start=9;
 let end=19;
@@ -760,7 +784,7 @@ e.preventDefault();
 
 let nome=document.getElementById("nome").value.trim();
 let apelido=document.getElementById("apelido").value.trim();
-let whatsapp=document.getElementById("whatsapp").value.trim();
+let whatsapp=document.getElementById("whatsapp").value.replace(/\D/g,"").trim();
 
 if(!selectedDate || !selectedDay){
 show("Selecione um dia.","error");
