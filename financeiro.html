@@ -534,9 +534,79 @@
       document.getElementById("guilhermeRevenue").textContent = formatMoney(guilhermeRevenue);
     }
 
+    async function atualizarStatusAutomatico() {
+  initSupabase();
+  if (!supabaseClient) return;
+
+  const agora = new Date();
+  const hoje = getLocalISODate();
+
+  const { data, error } = await supabaseClient
+    .from("appointments")
+    .select("id, appointment_date, appointment_time, status")
+    .lte("appointment_date", hoje);
+
+  if (error) {
+    console.error("Erro ao atualizar status automático:", error);
+    showToast("Erro ao atualizar status automático: " + error.message, "error");
+    return;
+  }
+
+  for (const item of data || []) {
+    const statusAtual = String(item.status || "novo").toLowerCase().trim();
+
+    if (
+      statusAtual === "cancelado" ||
+      statusAtual === "cancelled" ||
+      statusAtual === "canceled" ||
+      statusAtual === "excluido" ||
+      statusAtual === "deleted" ||
+      statusAtual === "finalizado"
+    ) {
+      continue;
+    }
+
+    if (!item.appointment_date || !item.appointment_time) {
+      continue;
+    }
+
+    const hora = String(item.appointment_time).slice(0, 5);
+    const [year, month, day] = String(item.appointment_date).split("-").map(Number);
+    const [hour, minute] = hora.split(":").map(Number);
+
+    const inicio = new Date(year, month - 1, day, hour, minute, 0);
+    const fim = new Date(inicio);
+
+    fim.setMinutes(fim.getMinutes() + 45);
+
+    let novoStatus = statusAtual;
+
+    if (agora >= inicio && agora < fim) {
+      novoStatus = "em_atendimento";
+    }
+
+    if (agora >= fim) {
+      novoStatus = "finalizado";
+    }
+
+    if (novoStatus !== statusAtual) {
+      const { error: updateError } = await supabaseClient
+        .from("appointments")
+        .update({ status: novoStatus })
+        .eq("id", item.id);
+
+      if (updateError) {
+        console.error("Erro ao atualizar status do agendamento:", updateError);
+      }
+    }
+  }
+}
+    
     async function loadFinance() {
       initSupabase();
       if (!supabaseClient) return;
+    
+      await atualizarStatusAutomatico();
 
       const loading = document.getElementById("loading");
       const empty = document.getElementById("empty");
