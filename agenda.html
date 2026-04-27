@@ -708,12 +708,12 @@ timesMessage.style.display="none";
 timesMessage.style.display="block";
 timesMessage.innerText="Carregando horários...";
 
-let start=9;
-let end=19;
+let start = 9;
+let end = 21;
 
-if(selectedDay==="Segunda-feira"){
-start=14;
-end=20;
+if(selectedDay === "Segunda-feira"){
+  start = 14;
+  end = 21;
 }
 
 let ocupados=await buscarOcupados();
@@ -729,7 +729,7 @@ limit.setHours(end,0,0,0);
 
 let horariosDisponiveis=0;
 
-while(current<limit){
+current.setMinutes(current.getMinutes() + 45);
 let h=String(current.getHours()).padStart(2,"0");
 let m=String(current.getMinutes()).padStart(2,"0");
 let time=`${h}:${m}`;
@@ -764,7 +764,7 @@ document.getElementById("nome").focus();
 }
 
 timesContainer.appendChild(btn);
-current.setMinutes(current.getMinutes()+40);
+current.setMinutes(current.getMinutes() + 45);
 }
 
 if(horariosDisponiveis===0){
