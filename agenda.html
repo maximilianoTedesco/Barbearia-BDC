@@ -497,6 +497,7 @@ grid-template-columns:1fr;
 <p class="section-subtitle">Selecione qual serviço deseja realizar neste horário.</p>
 <div id="services" class="services">
 <button type="button" class="service-btn" data-service="Corte">Corte</button>
+<button type="button" class="service-btn" data-service="Corte + Sobrancelha">Corte + Sobrancelha</button>
 <button type="button" class="service-btn" data-service="Corte + Barba">Corte + Barba</button>
 <button type="button" class="service-btn" data-service="Corte + Barba + Sobrancelha">Corte + Barba + Sobrancelha</button>
 </div>
@@ -582,6 +583,7 @@ let selectedDate="";
 let selectedDay="";
 let selectedTime="";
 let selectedService="";
+let selectedPrice=0;
 
 barberSelected.innerHTML=barbeiro ? `Barbeiro selecionado: <span>${barbeiro}</span>` : "";
 
@@ -620,6 +622,21 @@ return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart
 function normalizarHorario(time){
 if(!time)return "";
 return String(time).slice(0,5);
+}
+
+function calcularValorServico(service){
+if(service==="Corte")return 35;
+if(service==="Corte + Barba")return 60;
+if(service==="Corte + Sobrancelha")return 47;
+if(service==="Corte + Barba + Sobrancelha")return 72;
+return 0;
+}
+
+function formatarValor(valor){
+return valor.toLocaleString("pt-BR", {
+style:"currency",
+currency:"BRL"
+});
 }
 
 function statusOcupaHorario(status){
@@ -692,7 +709,8 @@ selectedSummary.innerHTML=`
 Barbeiro: ${barbeiro}<br>
 Dia: ${selectedDay}<br>
 Horário: ${selectedTime}<br>
-Serviço: ${selectedService || "Ainda não selecionado"}
+Serviço: ${selectedService || "Ainda não selecionado"}<br>
+Valor: ${selectedPrice ? formatarValor(selectedPrice) : "Ainda não calculado"}
 `;
 }
 
@@ -726,6 +744,7 @@ selectedDate=btn.dataset.date;
 selectedDay=btn.dataset.day;
 selectedTime="";
 selectedService="";
+selectedPrice=0;
 serviceSection.style.display="none";
 serviceButtons.forEach(b=>b.classList.remove("active"));
 
@@ -807,6 +826,7 @@ while(current <= limit){
 
       selectedTime = time;
       selectedService = "";
+      selectedPrice = 0;
       serviceButtons.forEach(b => b.classList.remove("active"));
       serviceSection.style.display = "block";
       atualizarResumo();
@@ -837,6 +857,7 @@ btn.onclick=()=>{
 serviceButtons.forEach(b=>b.classList.remove("active"));
 btn.classList.add("active");
 selectedService=btn.dataset.service;
+selectedPrice=calcularValorServico(selectedService);
 atualizarResumo();
 rolarParaFormulario();
 
@@ -896,6 +917,7 @@ weekday:selectedDay,
 appointment_date:selectedDate,
 appointment_time:selectedTime,
 service:selectedService,
+price:selectedPrice,
 status:"novo"
 }]);
 
@@ -950,6 +972,7 @@ const mensagem=`Acabei de agendar um horário com o barbeiro ${barbeiro}.
 Dia: ${selectedDay}
 Horário: ${selectedTime}
 Serviço: ${selectedService}
+Valor: ${formatarValor(selectedPrice)}
 Cliente: ${nome}`;
 
 const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
