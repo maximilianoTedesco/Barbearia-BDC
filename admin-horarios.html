@@ -280,6 +280,26 @@
       font-weight: 800;
     }
 
+    .status-agendado {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .status-atendimento {
+      background: #d97706;
+      color: #000;
+    }
+
+    .status-finalizado {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .status-cancelado {
+      background: var(--danger);
+      color: #fff;
+    }
+
     .empty {
       color: var(--muted);
       padding: 18px 0;
@@ -501,8 +521,11 @@
           <label for="filterStatus">Status</label>
           <select id="filterStatus">
             <option value="">Todos</option>
-            <option value="scheduled">Agendado</option>
-            <option value="novo">Novo</option>
+            <option value="novo">Agendado</option>
+            <option value="scheduled">Agendado antigo</option>
+            <option value="em_atendimento">Em atendimento</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="cancelado">Cancelado</option>
           </select>
         </div>
 
@@ -743,14 +766,34 @@
     }
 
     function statusLabel(status) {
-  if (status === "novo") return "Agendado";
-  if (status === "scheduled") return "Agendado";
-  if (status === "em_atendimento") return "Em atendimento";
-  if (status === "finalizado") return "Finalizado";
-  if (status === "cancelado") return "Cancelado";
-  if (status === "cancelled") return "Cancelado";
-  return "Agendado";
-}
+      if (status === "novo") return "Agendado";
+      if (status === "scheduled") return "Agendado";
+      if (status === "em_atendimento") return "Em atendimento";
+      if (status === "finalizado") return "Finalizado";
+      if (status === "cancelado") return "Cancelado";
+      if (status === "cancelled") return "Cancelado";
+      if (status === "canceled") return "Cancelado";
+      if (status === "excluido") return "Excluído";
+      if (status === "deleted") return "Excluído";
+      return "Agendado";
+    }
+
+    function statusClass(status) {
+      if (status === "em_atendimento") return "status-atendimento";
+      if (status === "finalizado") return "status-finalizado";
+
+      if (
+        status === "cancelado" ||
+        status === "cancelled" ||
+        status === "canceled" ||
+        status === "excluido" ||
+        status === "deleted"
+      ) {
+        return "status-cancelado";
+      }
+
+      return "status-agendado";
+    }
 
     function escapeText(value) {
       return String(value ?? "")
@@ -790,51 +833,70 @@ function updateCounters(data) {
   document.getElementById("totalCount").textContent = data.length;
   updateSelectedDateLabel();
 }
-    async function atualizarStatusAutomatico(){
+
+async function atualizarStatusAutomatico() {
   initSupabase();
-  if(!supabaseClient) return;
+  if (!supabaseClient) return;
 
   const agora = new Date();
-  const hoje = agora.toISOString().split("T")[0];
+  const hoje = getTodayValue();
 
   const { data, error } = await supabaseClient
     .from("appointments")
     .select("id, appointment_date, appointment_time, status")
-    .eq("appointment_date", hoje);
+    .lte("appointment_date", hoje);
 
-  if(error){
-    console.error("Erro ao atualizar status:", error);
+  if (error) {
+    console.error("Erro ao atualizar status automático:", error);
+    showToast("Erro ao atualizar status automático: " + error.message, "error");
     return;
   }
 
-  for(const item of data || []){
+  for (const item of data || []) {
+    const statusAtual = String(item.status || "novo").toLowerCase().trim();
 
-    // não mexe em cancelado ou finalizado
-    if(item.status === "cancelado" || item.status === "finalizado"){
+    if (
+      statusAtual === "cancelado" ||
+      statusAtual === "cancelled" ||
+      statusAtual === "canceled" ||
+      statusAtual === "excluido" ||
+      statusAtual === "deleted" ||
+      statusAtual === "finalizado"
+    ) {
       continue;
     }
 
-    const hora = String(item.appointment_time).slice(0,5);
+    if (!item.appointment_date || !item.appointment_time) {
+      continue;
+    }
 
-    const inicio = new Date(`${item.appointment_date}T${hora}:00`);
+    const hora = String(item.appointment_time).slice(0, 5);
+    const [year, month, day] = String(item.appointment_date).split("-").map(Number);
+    const [hour, minute] = hora.split(":").map(Number);
+
+    const inicio = new Date(year, month - 1, day, hour, minute, 0);
     const fim = new Date(inicio);
     fim.setMinutes(fim.getMinutes() + 45);
 
-    let novoStatus = item.status;
+    let novoStatus = statusAtual;
 
-    if(agora >= inicio && agora < fim){
+    if (agora >= inicio && agora < fim) {
       novoStatus = "em_atendimento";
     }
 
-    if(agora >= fim){
+    if (agora >= fim) {
       novoStatus = "finalizado";
     }
 
-    if(novoStatus !== item.status){
-      await supabaseClient
+    if (novoStatus !== statusAtual) {
+      const { error: updateError } = await supabaseClient
         .from("appointments")
         .update({ status: novoStatus })
         .eq("id", item.id);
+
+      if (updateError) {
+        console.error("Erro ao atualizar status do agendamento:", updateError);
+      }
     }
   }
 }
@@ -844,6 +906,7 @@ function updateCounters(data) {
       if (!supabaseClient) return;
 
       await atualizarStatusAutomatico();
+
       const loading = document.getElementById("loading");
       const empty = document.getElementById("empty");
       const table = document.getElementById("appointmentsTable");
@@ -924,7 +987,7 @@ function updateCounters(data) {
   <strong>${item.service_value ? formatMoney(item.service_value) : "-"}</strong>
 </td>
 <td data-label="Status">
-  <span class="status">${escapeText(statusLabel(status))}</span>
+  <span class="status ${escapeText(statusClass(status))}">${escapeText(statusLabel(status))}</span>
 </td>
 <td data-label="Ações">
   <div class="actions">
@@ -1091,6 +1154,12 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
       if (localStorage.getItem("bdc_admin_horarios") === "true") {
         showAdmin();
       }
+
+      setInterval(() => {
+        if (!document.getElementById("adminScreen").classList.contains("hidden")) {
+          loadAppointments();
+        }
+      }, 60000);
     });
   </script>
 </body>
