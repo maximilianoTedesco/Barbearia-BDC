@@ -32,11 +32,7 @@
       padding: 18px;
     }
 
-    .container {
-      max-width: 1220px;
-      margin: 0 auto;
-    }
-
+    .container { max-width: 1180px; margin: 0 auto; }
     .hidden { display: none !important; }
 
     header {
@@ -50,20 +46,14 @@
       border-bottom: 1px solid var(--border);
     }
 
-    h1 {
-      color: var(--gold);
-      font-size: 28px;
-    }
-
-    h2 {
-      font-size: 18px;
-      margin-bottom: 14px;
-    }
+    h1 { color: var(--gold); font-size: 28px; }
+    h2 { font-size: 18px; margin-bottom: 14px; }
 
     .subtitle {
       color: var(--muted);
       font-size: 14px;
       margin-top: 5px;
+      line-height: 1.4;
     }
 
     .card {
@@ -112,26 +102,12 @@
       font-size: 14px;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.06);
-    }
+    button:hover { transform: translateY(-1px); filter: brightness(1.06); }
 
-    .btn-primary {
-      background: var(--gold);
-      color: #000;
-    }
-
-    .btn-secondary {
-      background: #222;
-      color: #fff;
-      border: 1px solid #333;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: #fff;
-    }
+    .btn-primary { background: var(--gold); color: #000; }
+    .btn-secondary { background: #222; color: #fff; border: 1px solid #333; }
+    .btn-secondary.active { background: var(--gold); color: #000; border-color: var(--gold); }
+    .btn-danger { background: var(--danger); color: #fff; }
 
     .actions {
       display: flex;
@@ -139,16 +115,9 @@
       flex-wrap: wrap;
     }
 
-    .filters {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr auto;
-      gap: 12px;
-      align-items: end;
-    }
-
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       margin-bottom: 18px;
     }
@@ -157,7 +126,7 @@
       background: var(--panel-soft);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 16px;
+      padding: 18px;
     }
 
     .summary-card span {
@@ -169,19 +138,37 @@
 
     .summary-card strong {
       display: block;
-      font-size: 22px;
+      font-size: 25px;
       color: var(--gold);
     }
 
-    .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
+    .period-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
     }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .small-info {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 12px;
+      line-height: 1.45;
+    }
+
+    .table-wrapper { width: 100%; overflow-x: auto; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 900px;
+      min-width: 940px;
     }
 
     th,
@@ -199,9 +186,7 @@
       background: #0b0b0b;
     }
 
-    tbody tr:hover {
-      background: rgba(212,175,55,0.05);
-    }
+    tbody tr:hover { background: rgba(212,175,55,0.05); }
 
     .empty {
       color: var(--muted);
@@ -227,37 +212,20 @@
     .toast.error { border-left-color: var(--danger); }
     .toast.success { border-left-color: var(--success); }
 
-    @media (max-width: 1000px) {
-      .summary-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .filters {
-        grid-template-columns: 1fr 1fr;
-      }
+    @media (max-width: 900px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .filters { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 650px) {
       body { padding: 13px; }
-
       h1 { font-size: 24px; }
-
-      .summary-grid,
-      .filters {
-        grid-template-columns: 1fr;
-      }
-
+      .filters { grid-template-columns: 1fr; }
       .actions,
-      .actions button {
-        width: 100%;
-      }
+      .actions button,
+      .period-buttons button { width: 100%; }
 
-      table,
-      thead,
-      tbody,
-      th,
-      td,
-      tr {
+      table, thead, tbody, th, td, tr {
         display: block;
         min-width: unset;
       }
@@ -300,8 +268,8 @@
   <div class="container">
     <header>
       <div>
-        <h1>Relatório Financeiro</h1>
-        <p class="subtitle">Controle de valores lançados nos agendamentos da Barbearia BDC</p>
+        <h1>Financeiro</h1>
+        <p class="subtitle">Somente horários já finalizados entram na contabilidade.</p>
       </div>
 
       <div class="actions">
@@ -312,33 +280,30 @@
 
     <section class="summary-grid">
       <div class="summary-card">
-        <span>Total recebido</span>
+        <span>Total geral</span>
         <strong id="totalRevenue">R$ 0,00</strong>
       </div>
 
       <div class="summary-card">
-        <span>Total Brunin</span>
+        <span>Brunin</span>
         <strong id="bruninRevenue">R$ 0,00</strong>
       </div>
 
       <div class="summary-card">
-        <span>Total Guilherme</span>
+        <span>Guilherme</span>
         <strong id="guilhermeRevenue">R$ 0,00</strong>
-      </div>
-
-      <div class="summary-card">
-        <span>Cortes com valor</span>
-        <strong id="paidCount">0</strong>
-      </div>
-
-      <div class="summary-card">
-        <span>Ticket médio</span>
-        <strong id="averageTicket">R$ 0,00</strong>
       </div>
     </section>
 
     <div class="card">
       <h2>Filtros</h2>
+
+      <div class="period-buttons">
+        <button type="button" id="btnToday" class="btn-secondary" onclick="setToday()">Hoje</button>
+        <button type="button" id="btnWeek" class="btn-secondary" onclick="setThisWeek()">Semana</button>
+        <button type="button" id="btn30Days" class="btn-secondary" onclick="setLast30Days()">Últimos 30 dias</button>
+        <button type="button" id="btnCustom" class="btn-secondary" onclick="setCustomMode()">Escolher período</button>
+      </div>
 
       <div class="filters">
         <div>
@@ -360,30 +325,19 @@
           </select>
         </div>
 
-        <div>
-          <label for="valueFilter">Valores</label>
-          <select id="valueFilter">
-            <option value="">Todos</option>
-            <option value="with">Somente com valor</option>
-            <option value="without">Somente sem valor</option>
-          </select>
-        </div>
-
-        <button type="button" class="btn-primary" onclick="loadFinance()">Buscar</button>
+        <button type="button" class="btn-primary" onclick="setCustomMode(); loadFinance();">Buscar</button>
       </div>
 
-      <div class="actions" style="margin-top:14px;">
-        <button type="button" class="btn-secondary" onclick="setToday()">Hoje</button>
-        <button type="button" class="btn-secondary" onclick="setThisMonth()">Este mês</button>
-        <button type="button" class="btn-secondary" onclick="clearFilters()">Limpar filtros</button>
-      </div>
+      <p class="small-info">
+        O financeiro ignora horários cancelados/excluídos e só soma agendamentos cujo horário já terminou.
+      </p>
     </div>
 
     <div class="card">
-      <h2>Planilha financeira</h2>
+      <h2>Agendamentos contabilizados</h2>
 
-      <div id="loading" class="empty hidden">Carregando relatório...</div>
-      <div id="empty" class="empty hidden">Nenhum lançamento encontrado para os filtros selecionados.</div>
+      <div id="loading" class="empty hidden">Carregando financeiro...</div>
+      <div id="empty" class="empty hidden">Nenhum valor encontrado para os filtros selecionados.</div>
 
       <div class="table-wrapper">
         <table id="financeTable" class="hidden">
@@ -393,7 +347,7 @@
               <th>Horário</th>
               <th>Barbeiro</th>
               <th>Cliente</th>
-              <th>WhatsApp</th>
+              <th>Serviço</th>
               <th>Valor</th>
             </tr>
           </thead>
@@ -428,39 +382,64 @@
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    function getTodayValue() {
-      const now = new Date();
-      const offset = now.getTimezoneOffset();
-      const localDate = new Date(now.getTime() - offset * 60000);
+    function getLocalISODate(date = new Date()) {
+      const offset = date.getTimezoneOffset();
+      const localDate = new Date(date.getTime() - offset * 60000);
       return localDate.toISOString().split("T")[0];
     }
 
-    function getFirstDayOfMonth() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      return `${year}-${month}-01`;
+    function addDays(date, days) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+
+    function startOfWeekMonday(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+
+    function setActivePeriod(buttonId) {
+      ["btnToday", "btnWeek", "btn30Days", "btnCustom"].forEach(id => {
+        document.getElementById(id).classList.remove("active");
+      });
+
+      if (buttonId) {
+        document.getElementById(buttonId).classList.add("active");
+      }
     }
 
     function setToday() {
-      const today = getTodayValue();
+      const today = getLocalISODate();
       document.getElementById("startDate").value = today;
       document.getElementById("endDate").value = today;
+      setActivePeriod("btnToday");
       loadFinance();
     }
 
-    function setThisMonth() {
-      document.getElementById("startDate").value = getFirstDayOfMonth();
-      document.getElementById("endDate").value = getTodayValue();
+    function setThisWeek() {
+      const now = new Date();
+      const start = startOfWeekMonday(now);
+      document.getElementById("startDate").value = getLocalISODate(start);
+      document.getElementById("endDate").value = getLocalISODate(now);
+      setActivePeriod("btnWeek");
       loadFinance();
     }
 
-    function clearFilters() {
-      document.getElementById("startDate").value = "";
-      document.getElementById("endDate").value = "";
-      document.getElementById("filterBarber").value = "";
-      document.getElementById("valueFilter").value = "";
+    function setLast30Days() {
+      const now = new Date();
+      const start = addDays(now, -29);
+      document.getElementById("startDate").value = getLocalISODate(start);
+      document.getElementById("endDate").value = getLocalISODate(now);
+      setActivePeriod("btn30Days");
       loadFinance();
+    }
+
+    function setCustomMode() {
+      setActivePeriod("btnCustom");
     }
 
     function formatDate(dateValue) {
@@ -484,8 +463,39 @@
       return item.customer_name || item.client_name || item.name || item.nome || "-";
     }
 
-    function getWhatsapp(item) {
-      return item.customer_whatsapp || item.whatsapp || item.phone || item.telefone || "-";
+    function getServiceName(item) {
+      return item.service || item.servico || "-";
+    }
+
+    function getServiceValue(item) {
+      return Number(item.service_value || item.price || 0);
+    }
+
+    function statusValido(status) {
+      if (!status) return true;
+
+      const s = String(status).toLowerCase().trim();
+
+      if (s === "cancelled") return false;
+      if (s === "canceled") return false;
+      if (s === "cancelado") return false;
+      if (s === "excluido") return false;
+      if (s === "deleted") return false;
+
+      return true;
+    }
+
+    function isAppointmentFinished(item) {
+      if (!item.appointment_date || !item.appointment_time) return false;
+
+      const time = String(item.appointment_time).slice(0, 5);
+      const [hour, minute] = time.split(":").map(Number);
+      const [year, month, day] = String(item.appointment_date).split("-").map(Number);
+
+      const endDate = new Date(year, month - 1, day, hour, minute, 0);
+      endDate.setMinutes(endDate.getMinutes() + 45);
+
+      return endDate <= new Date();
     }
 
     function escapeText(value) {
@@ -509,28 +519,19 @@
     }
 
     function updateSummary(data) {
-      const withValue = data.filter(item => Number(item.service_value || 0) > 0);
+      const totalRevenue = data.reduce((sum, item) => sum + getServiceValue(item), 0);
 
-      const totalRevenue = withValue.reduce((sum, item) => {
-        return sum + Number(item.service_value || 0);
-      }, 0);
-
-      const bruninRevenue = withValue
+      const bruninRevenue = data
         .filter(item => item.barber_id === "1f39cf56-9a40-42ee-a968-56f1537b47c3")
-        .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
+        .reduce((sum, item) => sum + getServiceValue(item), 0);
 
-      const guilhermeRevenue = withValue
+      const guilhermeRevenue = data
         .filter(item => item.barber_id === "766b291c-4b4f-47ad-89e5-7893b1af0d28")
-        .reduce((sum, item) => sum + Number(item.service_value || 0), 0);
-
-      const paidCount = withValue.length;
-      const averageTicket = paidCount > 0 ? totalRevenue / paidCount : 0;
+        .reduce((sum, item) => sum + getServiceValue(item), 0);
 
       document.getElementById("totalRevenue").textContent = formatMoney(totalRevenue);
       document.getElementById("bruninRevenue").textContent = formatMoney(bruninRevenue);
       document.getElementById("guilhermeRevenue").textContent = formatMoney(guilhermeRevenue);
-      document.getElementById("paidCount").textContent = paidCount;
-      document.getElementById("averageTicket").textContent = formatMoney(averageTicket);
     }
 
     async function loadFinance() {
@@ -550,7 +551,6 @@
       const startDate = document.getElementById("startDate").value;
       const endDate = document.getElementById("endDate").value;
       const filterBarber = document.getElementById("filterBarber").value;
-      const valueFilter = document.getElementById("valueFilter").value;
 
       let query = supabaseClient
         .from("appointments")
@@ -558,17 +558,9 @@
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 
-      if (startDate) {
-        query = query.gte("appointment_date", startDate);
-      }
-
-      if (endDate) {
-        query = query.lte("appointment_date", endDate);
-      }
-
-      if (filterBarber) {
-        query = query.eq("barber_id", filterBarber);
-      }
+      if (startDate) query = query.gte("appointment_date", startDate);
+      if (endDate) query = query.lte("appointment_date", endDate);
+      if (filterBarber) query = query.eq("barber_id", filterBarber);
 
       const { data, error } = await query;
 
@@ -580,15 +572,10 @@
         return;
       }
 
-      let filteredData = data || [];
-
-      if (valueFilter === "with") {
-        filteredData = filteredData.filter(item => Number(item.service_value || 0) > 0);
-      }
-
-      if (valueFilter === "without") {
-        filteredData = filteredData.filter(item => !item.service_value || Number(item.service_value) === 0);
-      }
+      const filteredData = (data || [])
+        .filter(item => statusValido(item.status))
+        .filter(item => isAppointmentFinished(item))
+        .filter(item => getServiceValue(item) > 0);
 
       updateSummary(filteredData);
 
@@ -602,16 +589,16 @@
 
         const barberName = item.barber_name || getBarberName(item.barber_id);
         const clientName = getClientName(item);
-        const whatsapp = getWhatsapp(item);
-        const value = Number(item.service_value || 0);
+        const serviceName = getServiceName(item);
+        const value = getServiceValue(item);
 
         tr.innerHTML = `
           <td data-label="Data">${escapeText(formatDate(item.appointment_date))}</td>
-          <td data-label="Horário"><strong>${escapeText(item.appointment_time || "-")}</strong></td>
+          <td data-label="Horário"><strong>${escapeText(String(item.appointment_time || "-").slice(0, 5))}</strong></td>
           <td data-label="Barbeiro">${escapeText(barberName)}</td>
           <td data-label="Cliente">${escapeText(clientName)}</td>
-          <td data-label="WhatsApp">${escapeText(whatsapp)}</td>
-          <td data-label="Valor"><strong>${value > 0 ? formatMoney(value) : "-"}</strong></td>
+          <td data-label="Serviço">${escapeText(serviceName)}</td>
+          <td data-label="Valor"><strong>${formatMoney(value)}</strong></td>
         `;
 
         body.appendChild(tr);
@@ -621,7 +608,13 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      setThisMonth();
+      initSupabase();
+
+      document.getElementById("startDate").addEventListener("change", setCustomMode);
+      document.getElementById("endDate").addEventListener("change", setCustomMode);
+      document.getElementById("filterBarber").addEventListener("change", loadFinance);
+
+      setToday();
     });
   </script>
 </body>
