@@ -980,7 +980,7 @@ async function atualizarStatusAutomatico() {
 
         const whatsapp = getWhatsapp(item);
         const clientName = getClientName(item);
-        const status = item.status || "scheduled";
+        const status = calcularStatusAtual(item);
         const barberName = item.barber_name || getBarberName(item.barber_id);
 
         tr.innerHTML = `
