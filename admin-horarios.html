@@ -834,11 +834,48 @@ function updateCounters(data) {
   updateSelectedDateLabel();
 }
 
+    function calcularStatusAtual(item) {
+  const statusAtual = String(item.status || "novo").toLowerCase().trim();
+
+  if (
+    statusAtual === "cancelado" ||
+    statusAtual === "cancelled" ||
+    statusAtual === "canceled" ||
+    statusAtual === "excluido" ||
+    statusAtual === "deleted"
+  ) {
+    return statusAtual;
+  }
+
+  if (!item.appointment_date || !item.appointment_time) {
+    return statusAtual;
+  }
+
+  const hora = String(item.appointment_time).slice(0, 5);
+  const [year, month, day] = String(item.appointment_date).split("-").map(Number);
+  const [hour, minute] = hora.split(":").map(Number);
+
+  const inicio = new Date(year, month - 1, day, hour, minute, 0);
+  const fim = new Date(inicio);
+  fim.setMinutes(fim.getMinutes() + 45);
+
+  const agora = new Date();
+
+  if (agora >= fim) {
+    return "finalizado";
+  }
+
+  if (agora >= inicio && agora < fim) {
+    return "em_atendimento";
+  }
+
+  return "novo";
+}
+
 async function atualizarStatusAutomatico() {
   initSupabase();
   if (!supabaseClient) return;
 
-  const agora = new Date();
   const hoje = getTodayValue();
 
   const { data, error } = await supabaseClient
@@ -847,46 +884,14 @@ async function atualizarStatusAutomatico() {
     .lte("appointment_date", hoje);
 
   if (error) {
-    console.error("Erro ao atualizar status automático:", error);
+    console.error("Erro ao buscar agendamentos para atualizar status:", error);
     showToast("Erro ao atualizar status automático: " + error.message, "error");
     return;
   }
 
   for (const item of data || []) {
     const statusAtual = String(item.status || "novo").toLowerCase().trim();
-
-    if (
-      statusAtual === "cancelado" ||
-      statusAtual === "cancelled" ||
-      statusAtual === "canceled" ||
-      statusAtual === "excluido" ||
-      statusAtual === "deleted" ||
-      statusAtual === "finalizado"
-    ) {
-      continue;
-    }
-
-    if (!item.appointment_date || !item.appointment_time) {
-      continue;
-    }
-
-    const hora = String(item.appointment_time).slice(0, 5);
-    const [year, month, day] = String(item.appointment_date).split("-").map(Number);
-    const [hour, minute] = hora.split(":").map(Number);
-
-    const inicio = new Date(year, month - 1, day, hour, minute, 0);
-    const fim = new Date(inicio);
-    fim.setMinutes(fim.getMinutes() + 45);
-
-    let novoStatus = statusAtual;
-
-    if (agora >= inicio && agora < fim) {
-      novoStatus = "em_atendimento";
-    }
-
-    if (agora >= fim) {
-      novoStatus = "finalizado";
-    }
+    const novoStatus = calcularStatusAtual(item);
 
     if (novoStatus !== statusAtual) {
       const { error: updateError } = await supabaseClient
@@ -895,12 +900,13 @@ async function atualizarStatusAutomatico() {
         .eq("id", item.id);
 
       if (updateError) {
-        console.error("Erro ao atualizar status do agendamento:", updateError);
+        console.error("Erro ao salvar novo status:", updateError);
+        showToast("Erro ao salvar status automático: " + updateError.message, "error");
       }
     }
   }
 }
-
+    
     async function loadAppointments() {
       initSupabase();
       if (!supabaseClient) return;
