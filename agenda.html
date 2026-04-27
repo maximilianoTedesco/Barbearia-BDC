@@ -206,6 +206,36 @@ font-weight:800;
 color:#f5d28a;
 }
 
+.combo-btn{
+  position:relative;
+  border:2px solid #f5d28a;
+  background:linear-gradient(135deg, #2b1b00, #111, #3a2600);
+  box-shadow:0 0 22px rgba(245,210,138,.28);
+  transform:scale(1.03);
+}
+
+.combo-btn small{
+  display:inline-block;
+  margin-bottom:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  background:linear-gradient(135deg, #f5d28a, #d4af37);
+  color:#111;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.8px;
+}
+
+.combo-btn span{
+  font-size:16px;
+  color:#f5d28a;
+}
+
+.combo-btn:hover{
+  transform:translateY(-2px) scale(1.04);
+  box-shadow:0 0 28px rgba(245,210,138,.42);
+}
+  
 .service-btn.active span{
 color:#2c2107;
 }
@@ -511,7 +541,12 @@ grid-template-columns:1fr;
 <button type="button" class="service-btn" data-service="Corte">Corte<br><span>R$ 35,00</span></button>
 <button type="button" class="service-btn" data-service="Corte + Sobrancelha">Corte + Sobrancelha<br><span>R$ 47,00</span></button>
 <button type="button" class="service-btn" data-service="Corte + Barba">Corte + Barba<br><span>R$ 60,00</span></button>
-<button type="button" class="service-btn" data-service="Corte + Barba + Sobrancelha">Corte + Barba + Sobrancelha<br><span>R$ 72,00</span></button>
+<button type="button" class="service-btn combo-btn" data-service="Corte + Barba + Sobrancelha">
+  <small>COMBO</small>
+  Corte + Barba + Sobrancelha
+  <br>
+  <span>R$ 65,00</span>
+</button>
 </div>
 </section>
 
@@ -640,7 +675,7 @@ function calcularValorServico(service){
 if(service==="Corte")return 35;
 if(service==="Corte + Barba")return 60;
 if(service==="Corte + Sobrancelha")return 47;
-if(service==="Corte + Barba + Sobrancelha")return 72;
+if(service==="Corte + Barba + Sobrancelha")return 65;
 return 0;
 }
 
