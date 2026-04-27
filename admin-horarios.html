@@ -743,11 +743,14 @@
     }
 
     function statusLabel(status) {
-      if (status === "novo") return "Agendado";
-      if (status === "scheduled") return "Agendado";
-      if (status === "cancelled") return "Cancelado";
-      return "Agendado";
-    }
+  if (status === "novo") return "Agendado";
+  if (status === "scheduled") return "Agendado";
+  if (status === "em_atendimento") return "Em atendimento";
+  if (status === "finalizado") return "Finalizado";
+  if (status === "cancelado") return "Cancelado";
+  if (status === "cancelled") return "Cancelado";
+  return "Agendado";
+}
 
     function escapeText(value) {
       return String(value ?? "")
@@ -787,11 +790,60 @@ function updateCounters(data) {
   document.getElementById("totalCount").textContent = data.length;
   updateSelectedDateLabel();
 }
+    async function atualizarStatusAutomatico(){
+  initSupabase();
+  if(!supabaseClient) return;
+
+  const agora = new Date();
+  const hoje = agora.toISOString().split("T")[0];
+
+  const { data, error } = await supabaseClient
+    .from("appointments")
+    .select("id, appointment_date, appointment_time, status")
+    .eq("appointment_date", hoje);
+
+  if(error){
+    console.error("Erro ao atualizar status:", error);
+    return;
+  }
+
+  for(const item of data || []){
+
+    // não mexe em cancelado ou finalizado
+    if(item.status === "cancelado" || item.status === "finalizado"){
+      continue;
+    }
+
+    const hora = String(item.appointment_time).slice(0,5);
+
+    const inicio = new Date(`${item.appointment_date}T${hora}:00`);
+    const fim = new Date(inicio);
+    fim.setMinutes(fim.getMinutes() + 45);
+
+    let novoStatus = item.status;
+
+    if(agora >= inicio && agora < fim){
+      novoStatus = "em_atendimento";
+    }
+
+    if(agora >= fim){
+      novoStatus = "finalizado";
+    }
+
+    if(novoStatus !== item.status){
+      await supabaseClient
+        .from("appointments")
+        .update({ status: novoStatus })
+        .eq("id", item.id);
+    }
+  }
+}
 
     async function loadAppointments() {
       initSupabase();
       if (!supabaseClient) return;
 
+      await atualizarStatusAutomatico();
       const loading = document.getElementById("loading");
       const empty = document.getElementById("empty");
       const table = document.getElementById("appointmentsTable");
