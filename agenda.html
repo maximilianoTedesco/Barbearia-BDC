@@ -625,6 +625,14 @@ return String(time).slice(0,5);
 }
 
 function calcularValorServico(service){
+  if(service === "Corte") return 35;
+  if(service === "Corte + Barba") return 60;
+  if(service === "Corte + Sobrancelha") return 47;
+  if(service === "Corte + Barba + Sobrancelha") return 72;
+  return 0;
+}
+
+function calcularValorServico(service){
 if(service==="Corte")return 35;
 if(service==="Corte + Barba")return 60;
 if(service==="Corte + Sobrancelha")return 47;
@@ -907,6 +915,8 @@ await gerarHorarios();
 return;
 }
 
+const servicePrice = calcularValorServico(selectedService);
+
 const {error}=await supabaseClient.from("appointments").insert([{
 barber_id:barberId,
 barber_name:barbeiro,
@@ -917,7 +927,7 @@ weekday:selectedDay,
 appointment_date:selectedDate,
 appointment_time:selectedTime,
 service:selectedService,
-price:selectedPrice,
+price:servicePrice,
 status:"novo"
 }]);
 
@@ -968,11 +978,13 @@ fecharPopupConfirmacao();
 
 const nome=document.getElementById("nome").value.trim();
 
+const valor = calcularValorServico(selectedService);
+
 const mensagem=`Acabei de agendar um horário com o barbeiro ${barbeiro}.
 Dia: ${selectedDay}
 Horário: ${selectedTime}
 Serviço: ${selectedService}
-Valor: ${formatarValor(selectedPrice)}
+Valor: R$ ${valor},00
 Cliente: ${nome}`;
 
 const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
