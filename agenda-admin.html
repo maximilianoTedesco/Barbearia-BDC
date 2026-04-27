@@ -143,6 +143,44 @@ button:hover{transform:translateY(-1px);}
   text-decoration:line-through;
 }
 
+.services-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+
+.service-btn{
+  background:#171717;
+  color:#fff;
+  border:1px solid #333;
+  padding:15px 12px;
+  border-radius:12px;
+  font-weight:900;
+  line-height:1.35;
+}
+
+.service-btn span{
+  display:block;
+  color:var(--muted);
+  font-size:13px;
+  margin-top:4px;
+}
+
+.service-btn:hover{
+  border-color:var(--gold);
+}
+
+.service-btn.selected{
+  background:var(--gold);
+  color:#000;
+  border-color:var(--gold);
+}
+
+.service-btn.selected span{
+  color:#1f1a05;
+}
+
 .message{
   padding:14px;
   border-radius:12px;
@@ -231,6 +269,7 @@ button:hover{transform:translateY(-1px);}
   .form-grid{grid-template-columns:1fr;}
   .actions button{width:100%;}
   .hours-grid{grid-template-columns:repeat(3,1fr);}
+  .services-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -291,6 +330,31 @@ button:hover{transform:translateY(-1px);}
 </section>
 
 <section class="card">
+  <h2>Escolha o serviço</h2>
+
+  <p class="tip">
+    Esse valor será salvo no agendamento e entrará no painel financeiro.
+  </p>
+
+  <div id="servicesGrid" class="services-grid">
+    <button type="button" class="service-btn" data-service="Corte" data-value="35">
+      Corte
+      <span>R$ 35,00</span>
+    </button>
+
+    <button type="button" class="service-btn" data-service="Corte + Barba" data-value="60">
+      Corte + Barba
+      <span>R$ 60,00</span>
+    </button>
+
+    <button type="button" class="service-btn" data-service="Corte + Barba + Sobrancelha" data-value="72">
+      Corte + Barba + Sobrancelha
+      <span>R$ 72,00</span>
+    </button>
+  </div>
+</section>
+
+<section class="card">
   <h2>Escolha o horário</h2>
 
   <p class="tip">
@@ -344,6 +408,8 @@ const diasSemana = [
 let selectedDate = "";
 let selectedDay = "";
 let selectedTime = "";
+let selectedService = "";
+let selectedServiceValue = 0;
 
 const appointmentDate = document.getElementById("appointmentDate");
 const barberSelect = document.getElementById("barberSelect");
@@ -352,6 +418,7 @@ const selectedInfo = document.getElementById("selectedInfo");
 const confirmBtn = document.getElementById("confirmBtn");
 const popupConfirmacao = document.getElementById("popupConfirmacao");
 const popupOkBtn = document.getElementById("popupOkBtn");
+const serviceButtons = document.querySelectorAll(".service-btn");
 
 function initSupabase(){
   if(supabaseClient) return;
@@ -418,6 +485,23 @@ function onlyNumbers(value){
   return String(value || "").replace(/\D/g, "");
 }
 
+function formatCurrency(value){
+  return Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+function selectService(btn){
+  serviceButtons.forEach(button => button.classList.remove("selected"));
+  btn.classList.add("selected");
+
+  selectedService = btn.dataset.service;
+  selectedServiceValue = Number(btn.dataset.value || 0);
+
+  updateSelectedInfo();
+}
+
 function setToday(){
   if(!appointmentDate.value){
     appointmentDate.value = formatISO(new Date());
@@ -438,7 +522,9 @@ function updateSelectedInfo(){
     <strong>Resumo:</strong><br>
     Data: ${day}/${month}/${year} - ${selectedDay}<br>
     Horário: ${selectedTime}<br>
-    Barbeiro: ${barberName}
+    Barbeiro: ${barberName}<br>
+    Serviço: ${selectedService || "Ainda não selecionado"}<br>
+    Valor: ${selectedServiceValue ? formatCurrency(selectedServiceValue) : "Ainda não calculado"}
   `;
 }
 
@@ -591,6 +677,11 @@ async function createAppointment(){
     return;
   }
 
+  if(!selectedService){
+    showMessage("Selecione o serviço do cliente.", "error");
+    return;
+  }
+
   if(!clientName){
     showMessage("Informe o nome do cliente.", "error");
     return;
@@ -623,6 +714,9 @@ async function createAppointment(){
     weekday: selectedDay,
     appointment_date: selectedDate,
     appointment_time: selectedTime,
+    service: selectedService,
+    service_value: selectedServiceValue,
+    price: selectedServiceValue,
     status: "novo"
   }]);
 
@@ -645,6 +739,9 @@ popupOkBtn.onclick = async () => {
   document.getElementById("observation").value = "";
 
   selectedTime = "";
+  selectedService = "";
+  selectedServiceValue = 0;
+  serviceButtons.forEach(button => button.classList.remove("selected"));
 
   confirmBtn.disabled = false;
   confirmBtn.innerText = "Confirmar agendamento";
@@ -658,6 +755,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   appointmentDate.addEventListener("change", gerarHorarios);
   barberSelect.addEventListener("change", gerarHorarios);
+
+  serviceButtons.forEach(btn => {
+    btn.addEventListener("click", () => selectService(btn));
+  });
 
   setTimeout(gerarHorarios, 300);
 });
