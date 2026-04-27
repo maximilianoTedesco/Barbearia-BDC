@@ -198,6 +198,18 @@ transition:.2s ease;
 box-shadow:0 10px 22px rgba(0,0,0,.25);
 }
 
+.service-btn span{
+display:block;
+margin-top:5px;
+font-size:13px;
+font-weight:800;
+color:#f5d28a;
+}
+
+.service-btn.active span{
+color:#2c2107;
+}
+
 .service-section{
 display:none;
 }
@@ -496,10 +508,10 @@ grid-template-columns:1fr;
 <h2 class="section-title">Escolha o serviço</h2>
 <p class="section-subtitle">Selecione qual serviço deseja realizar neste horário.</p>
 <div id="services" class="services">
-<button type="button" class="service-btn" data-service="Corte">Corte</button>
-<button type="button" class="service-btn" data-service="Corte + Sobrancelha">Corte + Sobrancelha</button>
-<button type="button" class="service-btn" data-service="Corte + Barba">Corte + Barba</button>
-<button type="button" class="service-btn" data-service="Corte + Barba + Sobrancelha">Corte + Barba + Sobrancelha</button>
+<button type="button" class="service-btn" data-service="Corte">Corte<br><span>R$ 35,00</span></button>
+<button type="button" class="service-btn" data-service="Corte + Sobrancelha">Corte + Sobrancelha<br><span>R$ 47,00</span></button>
+<button type="button" class="service-btn" data-service="Corte + Barba">Corte + Barba<br><span>R$ 60,00</span></button>
+<button type="button" class="service-btn" data-service="Corte + Barba + Sobrancelha">Corte + Barba + Sobrancelha<br><span>R$ 72,00</span></button>
 </div>
 </section>
 
@@ -919,6 +931,7 @@ weekday:selectedDay,
 appointment_date:selectedDate,
 appointment_time:selectedTime,
 service:selectedService,
+service_value:servicePrice,
 price:servicePrice,
 status:"novo"
 }]);
@@ -976,7 +989,7 @@ const mensagem=`Acabei de agendar um horário com o barbeiro ${barbeiro}.
 Dia: ${selectedDay}
 Horário: ${selectedTime}
 Serviço: ${selectedService}
-Valor: R$ ${valor},00
+Valor: ${formatarValor(valor)}
 Cliente: ${nome}`;
 
 const url=`https://wa.me/${telefoneBarbearia}?text=${encodeURIComponent(mensagem)}`;
