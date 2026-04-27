@@ -704,7 +704,6 @@ return (data || [])
 
 async function gerarHorarios(){
 timesContainer.innerHTML="";
-timesMessage.style.display="none";
 timesMessage.style.display="block";
 timesMessage.innerText="Carregando horários...";
 
@@ -716,63 +715,66 @@ if(selectedDay === "Segunda-feira"){
   end = 21;
 }
 
-let ocupados=await buscarOcupados();
+let ocupados = await buscarOcupados();
 
-let agora=new Date();
-let hoje=formatISO(agora);
+let agora = new Date();
+let hoje = formatISO(agora);
 
-let current=new Date();
+let current = new Date();
 current.setHours(start,0,0,0);
 
-let limit=new Date();
+let limit = new Date();
 limit.setHours(end,0,0,0);
 
-let horariosDisponiveis=0;
+let horariosDisponiveis = 0;
 
-current.setMinutes(current.getMinutes() + 45);
-let h=String(current.getHours()).padStart(2,"0");
-let m=String(current.getMinutes()).padStart(2,"0");
-let time=`${h}:${m}`;
+while(current <= limit){
+  let h = String(current.getHours()).padStart(2,"0");
+  let m = String(current.getMinutes()).padStart(2,"0");
+  let time = `${h}:${m}`;
 
-let passado=(selectedDate===hoje && current<agora);
-let ocupado=ocupados.includes(time)||passado;
+  let passado = selectedDate === hoje && current < agora;
+  let ocupado = ocupados.includes(time) || passado;
 
-let btn=document.createElement("button");
-btn.className=ocupado?"time-btn ocupado":"time-btn";
-btn.innerText=ocupado?`${time}\nIndisponível`:time;
-btn.disabled=ocupado;
+  let btn = document.createElement("button");
+  btn.className = ocupado ? "time-btn ocupado" : "time-btn";
+  btn.innerText = ocupado ? `${time}\nIndisponível` : time;
+  btn.disabled = ocupado;
 
-if(!ocupado){
-horariosDisponiveis++;
+  if(!ocupado){
+    horariosDisponiveis++;
 
-btn.onclick=()=>{
-document.querySelectorAll(".time-btn").forEach(b=>b.classList.remove("active"));
-btn.classList.add("active");
-selectedTime=time;
-atualizarResumo();
+    btn.onclick = () => {
+      document.querySelectorAll(".time-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-if(navigator.vibrate){
-navigator.vibrate(50);
+      selectedTime = time;
+      atualizarResumo();
+
+      if(navigator.vibrate){
+        navigator.vibrate(50);
+      }
+
+      rolarParaFormulario();
+
+      setTimeout(() => {
+        document.getElementById("nome").focus();
+      }, 500);
+    };
+  }
+
+  timesContainer.appendChild(btn);
+  current.setMinutes(current.getMinutes() + 45);
 }
 
-rolarParaFormulario();
-
-setTimeout(()=>{
-document.getElementById("nome").focus();
-},500);
-};
-}
-
-timesContainer.appendChild(btn);
-current.setMinutes(current.getMinutes() + 45);
-}
-
-if(horariosDisponiveis===0){
-timesMessage.style.display="block";
-timesMessage.innerText="Não há horários disponíveis para este dia.";
+if(horariosDisponiveis === 0){
+  timesMessage.style.display = "block";
+  timesMessage.innerText = "Não há horários disponíveis para este dia.";
+}else{
+  timesMessage.style.display = "none";
 }
 }
-
+  
 async function horarioAindaDisponivel(){
 const ocupados=await buscarOcupados();
 return !ocupados.includes(selectedTime);
