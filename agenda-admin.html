@@ -493,13 +493,14 @@ async function gerarHorarios(){
   }
 
   hoursGrid.innerHTML = "";
+  selectedInfo.innerHTML = "Carregando horários...";
 
   let start = 9;
-  let end = 19;
+  let end = 21;
 
   if(selectedDay === "Segunda-feira"){
     start = 14;
-    end = 20;
+    end = 21;
   }
 
   const ocupados = await buscarOcupados();
@@ -513,7 +514,9 @@ async function gerarHorarios(){
   const limit = new Date();
   limit.setHours(end, 0, 0, 0);
 
-  while(current < limit){
+  let horariosDisponiveis = 0;
+
+  while(current <= limit){
     const h = String(current.getHours()).padStart(2, "0");
     const m = String(current.getMinutes()).padStart(2, "0");
     const time = `${h}:${m}`;
@@ -528,6 +531,8 @@ async function gerarHorarios(){
     btn.disabled = ocupado;
 
     if(!ocupado){
+      horariosDisponiveis++;
+
       btn.onclick = () => {
         document.querySelectorAll(".hour-btn").forEach(b => b.classList.remove("selected"));
         btn.classList.add("selected");
@@ -537,10 +542,14 @@ async function gerarHorarios(){
     }
 
     hoursGrid.appendChild(btn);
-    current.setMinutes(current.getMinutes() + 40);
+    current.setMinutes(current.getMinutes() + 45);
   }
 
-  selectedInfo.innerHTML = "Selecione um horário disponível.";
+  if(horariosDisponiveis === 0){
+    selectedInfo.innerHTML = "Não há horários disponíveis para esta data.";
+  }else{
+    selectedInfo.innerHTML = "Selecione um horário disponível.";
+  }
 }
 
 async function horarioAindaDisponivel(){
