@@ -1090,8 +1090,19 @@ async function atualizarStatusAutomatico() {
     async function updateServiceValue(id) {
   initSupabase();
 
+  if (!supabaseClient) {
+    showToast("Supabase não inicializado.", "error");
+    return;
+  }
+
   const appointment = lastLoadedData.find(item => String(item.id) === String(id));
-  const valorAtual = appointment?.service_value || appointment?.price || "";
+
+  if (!appointment) {
+    showToast("Agendamento não encontrado na lista atual.", "error");
+    return;
+  }
+
+  const valorAtual = appointment.service_value || appointment.price || "";
 
   const novoValorTexto = prompt(
     "Informe o novo valor do serviço:",
@@ -1107,24 +1118,32 @@ async function atualizarStatusAutomatico() {
       .replace(",", ".")
   );
 
-  if (!novoValor || novoValor <= 0) {
+  if (isNaN(novoValor) || novoValor <= 0) {
     showToast("Valor inválido.", "error");
     return;
   }
 
-  const { error } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("appointments")
     .update({
       service_value: novoValor,
       price: novoValor
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id, service_value, price");
 
   if (error) {
-    console.error(error);
+    console.error("Erro ao atualizar valor:", error);
     showToast("Erro ao atualizar valor: " + error.message, "error");
     return;
   }
+
+  if (!data || data.length === 0) {
+    showToast("Nenhum registro foi atualizado. Verifique permissão UPDATE no Supabase.", "error");
+    return;
+  }
+
+  console.log("Valor atualizado no Supabase:", data);
 
   showToast("Valor atualizado com sucesso.", "success");
   await loadAppointments();
