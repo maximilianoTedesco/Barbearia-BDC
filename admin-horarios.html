@@ -990,7 +990,7 @@ async function atualizarStatusAutomatico() {
           <td data-label="Cliente">${escapeText(clientName)}</td>
 <td data-label="WhatsApp">${escapeText(whatsapp)}</td>
 <td data-label="Valor">
-  <strong>${item.service_value ? formatMoney(item.service_value) : "-"}</strong>
+  <strong>${(item.service_value || item.price) ? formatMoney(item.service_value || item.price) : "-"}</strong>
 </td>
 <td data-label="Status">
   <span class="status ${escapeText(statusClass(status))}">${escapeText(statusLabel(status))}</span>
@@ -1090,41 +1090,43 @@ async function atualizarStatusAutomatico() {
     async function updateServiceValue(id) {
   initSupabase();
 
-  if (!supabaseClient) return;
+  const appointment = lastLoadedData.find(item => String(item.id) === String(id));
+  const valorAtual = appointment?.service_value || appointment?.price || "";
 
-  const item = lastLoadedData.find(row => String(row.id) === String(id));
+  const novoValorTexto = prompt(
+    "Informe o novo valor do serviço:",
+    valorAtual ? String(valorAtual).replace(".", ",") : ""
+  );
 
-  const currentValue = item && item.service_value
-    ? String(item.service_value).replace(".", ",")
-    : "";
+  if (novoValorTexto === null) return;
 
-  const value = prompt("Digite o valor do corte. Exemplo: 35 ou 35,50", currentValue);
+  const novoValor = Number(
+    novoValorTexto
+      .replace("R$", "")
+      .replace(/\s/g, "")
+      .replace(",", ".")
+  );
 
-  if (value === null) return;
-
-  const cleanValue = value.replace(",", ".").trim();
-  const numberValue = Number(cleanValue);
-
-  if (isNaN(numberValue) || numberValue < 0) {
+  if (!novoValor || novoValor <= 0) {
     showToast("Valor inválido.", "error");
     return;
   }
 
   const { error } = await supabaseClient
-  .from("appointments")
-  .update({
-    service_value: numberValue,
-    price: numberValue
-  })
-  .eq("id", id);
+    .from("appointments")
+    .update({
+      service_value: novoValor,
+      price: novoValor
+    })
+    .eq("id", id);
 
   if (error) {
-    console.error("Erro ao salvar valor:", error);
-    showToast("Erro ao salvar valor: " + error.message, "error");
+    console.error(error);
+    showToast("Erro ao atualizar valor: " + error.message, "error");
     return;
   }
 
-  showToast("Valor salvo com sucesso.", "success");
+  showToast("Valor atualizado com sucesso.", "success");
   await loadAppointments();
 }
 
