@@ -265,7 +265,7 @@
 </head>
 
 <body>
-  <div class="container">
+  <div id="protectedContent" class="container hidden">
     <header>
       <div>
         <h1>Financeiro</h1>
@@ -380,6 +380,27 @@
       }
 
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    async function checkAuth() {
+      initSupabase();
+
+      if (!supabaseClient) {
+        alert("Erro ao carregar autenticação. Atualize a página.");
+        window.location.href = "admin-horarios.html";
+        return false;
+      }
+
+      const { data } = await supabaseClient.auth.getSession();
+
+      if (!data || !data.session) {
+        alert("Acesso não autorizado. Faça login pelo painel ADM.");
+        window.location.href = "admin-horarios.html";
+        return false;
+      }
+
+      document.getElementById("protectedContent").classList.remove("hidden");
+      return true;
     }
 
     function getLocalISODate(date = new Date()) {
@@ -677,8 +698,9 @@
       table.classList.remove("hidden");
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initSupabase();
+    document.addEventListener("DOMContentLoaded", async () => {
+      const autorizado = await checkAuth();
+      if (!autorizado) return;
 
       document.getElementById("startDate").addEventListener("change", setCustomMode);
       document.getElementById("endDate").addEventListener("change", setCustomMode);
