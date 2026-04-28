@@ -275,7 +275,7 @@ button:hover{transform:translateY(-1px);}
 </head>
 
 <body>
-<div class="container">
+<div id="protectedContent" class="container" style="display:none;">
 
 <header>
   <h1>Agendamento pelo Painel ADM</h1>
@@ -429,6 +429,27 @@ function initSupabase(){
   }
 
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+async function checkAuth(){
+  initSupabase();
+
+  if(!supabaseClient){
+    alert("Erro ao carregar autenticação. Atualize a página.");
+    window.location.href = "admin-horarios.html";
+    return false;
+  }
+
+  const { data } = await supabaseClient.auth.getSession();
+
+  if(!data || !data.session){
+    alert("Acesso não autorizado. Faça login pelo painel ADM.");
+    window.location.href = "admin-horarios.html";
+    return false;
+  }
+
+  document.getElementById("protectedContent").style.display = "block";
+  return true;
 }
 
 function formatISO(d){
@@ -749,9 +770,11 @@ popupOkBtn.onclick = async () => {
   await gerarHorarios();
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const autorizado = await checkAuth();
+  if(!autorizado) return;
+
   setToday();
-  initSupabase();
 
   appointmentDate.addEventListener("change", gerarHorarios);
   barberSelect.addEventListener("change", gerarHorarios);
