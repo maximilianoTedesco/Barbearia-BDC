@@ -465,10 +465,15 @@
 
     <div style="height:18px;"></div>
 
-    <label for="adminPassword">Senha do administrador</label>
-    <input type="password" id="adminPassword" placeholder="Digite a senha" autocomplete="current-password" />
+    <label for="adminEmail">E-mail do administrador</label>
+    <input type="email" id="adminEmail" placeholder="admin@bdc.com" autocomplete="username" />
 
-    <button type="button" class="btn-primary" onclick="login()" style="width:100%; margin-top:4px;">
+    <div style="height:12px;"></div>
+
+    <label for="adminPassword">Senha do administrador</label>
+    <input type="password" id="adminPassword" placeholder="Digite sua senha" autocomplete="current-password" />
+
+    <button type="button" class="btn-primary" onclick="login()" style="width:100%; margin-top:14px;">
       Entrar
     </button>
   </div>
@@ -616,8 +621,6 @@
     const SUPABASE_URL = "https://zbiitkbmdbcqoxeoyxdb.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_5F9YjdTTbIMFYLyUj-64wA_d5PH8_z_";
 
-    const ADMIN_PASSWORD = "Brunin123*";
-
     const BARBERS = {
       "1f39cf56-9a40-42ee-a968-56f1537b47c3": "Brunin",
       "766b291c-4b4f-47ad-89e5-7893b1af0d28": "Guilherme"
@@ -646,23 +649,46 @@
       supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    function login() {
+    async function login() {
+      initSupabase();
+
+      if (!supabaseClient) return;
+
+      const email = document.getElementById("adminEmail").value.trim();
       const password = document.getElementById("adminPassword").value.trim();
 
-      if (password !== ADMIN_PASSWORD) {
-        showToast("Senha incorreta.", "error");
+      if (!email || !password) {
+        showToast("Informe e-mail e senha.", "error");
         return;
       }
 
-      localStorage.setItem("bdc_admin_horarios", "true");
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        console.error("Erro de login:", error);
+        showToast("Login inválido. Verifique e-mail e senha.", "error");
+        return;
+      }
+
+      showToast("Login realizado com sucesso.", "success");
       showAdmin();
     }
 
-    function logout() {
-      localStorage.removeItem("bdc_admin_horarios");
+    async function logout() {
+      initSupabase();
+
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+      }
+
       document.getElementById("loginScreen").classList.remove("hidden");
       document.getElementById("adminScreen").classList.add("hidden");
+      document.getElementById("adminEmail").value = "";
       document.getElementById("adminPassword").value = "";
+      showToast("Você saiu do painel.", "success");
     }
 
     function showAdmin() {
@@ -1090,19 +1116,8 @@ async function atualizarStatusAutomatico() {
     async function updateServiceValue(id) {
   initSupabase();
 
-  if (!supabaseClient) {
-    showToast("Supabase não inicializado.", "error");
-    return;
-  }
-
   const appointment = lastLoadedData.find(item => String(item.id) === String(id));
-
-  if (!appointment) {
-    showToast("Agendamento não encontrado na lista atual.", "error");
-    return;
-  }
-
-  const valorAtual = appointment.service_value || appointment.price || "";
+  const valorAtual = appointment?.service_value || appointment?.price || "";
 
   const novoValorTexto = prompt(
     "Informe o novo valor do serviço:",
@@ -1118,32 +1133,24 @@ async function atualizarStatusAutomatico() {
       .replace(",", ".")
   );
 
-  if (isNaN(novoValor) || novoValor <= 0) {
+  if (!novoValor || novoValor <= 0) {
     showToast("Valor inválido.", "error");
     return;
   }
 
-  const { data, error } = await supabaseClient
+  const { error } = await supabaseClient
     .from("appointments")
     .update({
       service_value: novoValor,
       price: novoValor
     })
-    .eq("id", id)
-    .select("id, service_value, price");
+    .eq("id", id);
 
   if (error) {
-    console.error("Erro ao atualizar valor:", error);
+    console.error(error);
     showToast("Erro ao atualizar valor: " + error.message, "error");
     return;
   }
-
-  if (!data || data.length === 0) {
-    showToast("Nenhum registro foi atualizado. Verifique permissão UPDATE no Supabase.", "error");
-    return;
-  }
-
-  console.log("Valor atualizado no Supabase:", data);
 
   showToast("Valor atualizado com sucesso.", "success");
   await loadAppointments();
@@ -1170,7 +1177,13 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
       window.open(url, "_blank");
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
+      initSupabase();
+
+      document.getElementById("adminEmail").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") login();
+      });
+
       document.getElementById("adminPassword").addEventListener("keydown", (event) => {
         if (event.key === "Enter") login();
       });
@@ -1181,7 +1194,9 @@ Estamos entrando em contato sobre seu horário com o barbeiro ${barber}.`;
         if (event.key === "Enter") loadAppointments();
       });
 
-      if (localStorage.getItem("bdc_admin_horarios") === "true") {
+      const { data } = await supabaseClient.auth.getSession();
+
+      if (data && data.session) {
         showAdmin();
       }
 
